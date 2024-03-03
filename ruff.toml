@@ -1,0 +1,87 @@
+# Format settings file
+# https://docs.astral.sh/ruff/settings/
+include = [
+    "**/*.py"
+]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".ruff_cache",
+    ".pytest_cache",
+]
+
+# Avialable rules
+# https://docs.astral.sh/ruff/rules/
+select = [
+    "F",        # pyflakes
+    "E", "W",   # pycodestyle
+    "I",        # isort
+    "N",        # pep8-naming
+    "UP",       # pyupgrade
+    "BLE",      # flake8-blind-except
+    "B",        # flake8-bugbear
+    "A",        # flake8-builtins
+    "COM",      # flake8-commas
+    "C4",       # flake8-comprehensions
+    "T10",      # flake8-debugger
+    "INP",      # flake8-no-pep420
+    "T20",      # flake8-print
+    "Q",        # flake8-quotes
+    "SIM",      # flake8-simplify
+    "TCH",      # flake8-type-checking
+    "ARG",      # flake8-unused-arguments
+    "TD",       # flake8-todos
+    "ERA",      # eradicate
+
+    # Pylint
+    "PLC0132", "PLC0208", "PLC3002",
+    "PLE0307", "PLE0704",
+    "PLR1701", "PLR1714", "PLR2004",
+    "PLW0406", "PLW0711",
+]
+# Conflict rules with format mode (black tool)
+# https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+ignore = [
+    # pycodestyle
+    "E111", "E114", "E117", "W191",
+     # pep8-naming
+    "N805",
+    # flake8-commas
+    "COM812", "COM819",
+    # flake8-quotes
+    "Q000", "Q001", "Q002", "Q003",
+    # flake8-todos
+    "TD003",
+]
+
+line-length = 128
+
+
+[extend-per-file-ignores]
+"__init__.py" = ["F401"]
+
+
+[lint]
+preview = true
+
+
+[format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = true
+
+
+[lint.isort]
+combine-as-imports = true
+split-on-trailing-comma = false
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder"
+]
+
+
+[lint.flake8-quotes]
+inline-quotes = "single"
