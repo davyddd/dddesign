@@ -35,6 +35,10 @@ class AggregateDependencyMapper(BaseModel):
     _method_related_object_id_argument: MethodArgument = PrivateAttr()
     _related_object_id_attribute_name: str = PrivateAttr()
 
+    class Config:
+        allow_mutation = False
+        arbitrary_types_allowed = True
+
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
         self._method_related_object_id_argument = self._get_method_related_object_id_argument()
@@ -82,6 +86,10 @@ class AggregateListFactory(BaseModel, Generic[AggregateT]):
     aggregate_class: Type[AggregateT]
     aggregate_entity_attribute_name: str
     dependency_mappers: Tuple[AggregateDependencyMapper, ...]
+
+    class Config:
+        allow_mutation = False
+        arbitrary_types_allowed = True
 
     @root_validator
     def validate_consistency(cls, values):

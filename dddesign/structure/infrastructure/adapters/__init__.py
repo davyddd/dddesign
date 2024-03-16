@@ -1,2 +1,1 @@
-from .external import ExternalAdapter
-from .internal import InternalAdapter
+__all__ = ('external', 'internal')

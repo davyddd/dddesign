@@ -1,1 +1,1 @@
-__all__ = ('structure', 'utils')
+__all__ = ('structure', 'types', 'unittest', 'utils')

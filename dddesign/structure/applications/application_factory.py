@@ -5,7 +5,8 @@ from pydantic import BaseModel, PrivateAttr, root_validator, validator
 from dddesign.structure.applications import Application
 from dddesign.structure.domains.constants import BaseEnum
 from dddesign.structure.domains.errors import BaseError
-from dddesign.structure.infrastructure.adapters import ExternalAdapter, InternalAdapter
+from dddesign.structure.infrastructure.adapters.external import ExternalAdapter
+from dddesign.structure.infrastructure.adapters.internal import InternalAdapter
 from dddesign.structure.infrastructure.repositories import Repository
 from dddesign.structure.services.service import Service
 from dddesign.utils.convertors import convert_camel_case_to_snake_case
@@ -87,6 +88,7 @@ class ApplicationFactory(BaseModel, Generic[ApplicationT]):
     _application_implementations: Dict[RequestAttributeValueCombination, ApplicationT] = PrivateAttr()
 
     class Config:
+        allow_mutation = False
         arbitrary_types_allowed = True
 
     def __init__(self, **data: Any) -> None:

@@ -7,7 +7,7 @@ from dddesign.structure.domains.errors import BaseError, CollectionError
 CONTEXT_MESSAGES_PARAM = '__messages__'
 
 
-def wrap_base_model_error(error: ValidationError) -> CollectionError:
+def wrap_error(error: ValidationError) -> CollectionError:
     if not isinstance(error, ValidationError):
         raise TypeError('`exception` must be an instance of `pydantic.ValidationError`')
 
