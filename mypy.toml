@@ -6,3 +6,10 @@ exclude = [
     ".ruff_cache",
     ".pytest_cache"
 ]
+
+
+[[tool.mypy.overrides]]
+module = [
+    'fabric.*',
+]
+ignore_missing_imports = true
