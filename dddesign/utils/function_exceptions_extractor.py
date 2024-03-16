@@ -24,13 +24,14 @@ class ExceptionInfo(BaseModel):
         return {_k: _v.value if isinstance(_v, ast.Constant) else None for _k, _v in value.items()}
 
     def get_kwargs(self):
+        annotations = tuple(
+            argument_name
+            for argument_name in inspect.signature(self.exception_class.__init__).parameters
+            if argument_name not in ('self', 'args', 'kwargs')
+        )
+
         return {
-            **{
-                attribute_name: self.args[item]
-                for item, attribute_name in enumerate(
-                    tuple(self.exception_class.__init__.__annotations__.keys())[: len(self.args)]
-                )
-            },
+            **{attribute_name: self.args[item] for item, attribute_name in enumerate(annotations[: len(self.args)])},
             **self.kwargs,
         }
 

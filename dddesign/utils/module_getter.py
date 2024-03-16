@@ -5,7 +5,7 @@ from typing import List
 def get_module(module: ModuleType, sub_modules: List[str]) -> ModuleType:
     if not module:
         raise ValueError('Argument `module` is required')
-    elif isinstance(sub_modules, list):
+    elif not isinstance(sub_modules, list):
         raise ValueError('Argument `sub_modules` must be a list of strings')
 
     if len(sub_modules) == 0:

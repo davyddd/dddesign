@@ -1,20 +1,32 @@
 from fabric.api import local
 
 
-def run():
-    local('docker-compose run --rm runner-linters')
-
-
 def build():
-    local('docker-compose build runner-linters')
+    local('docker-compose build dddesign')
+
+
+def _run_command_container(command):
+    container_id = local("docker ps | grep 'dddesign' | awk '{{ print $1 }}' | head -n 1", capture=True)
+    if container_id:
+        local(f'docker exec -it {container_id} bash -c "{command}"')
+    else:
+        local(f'docker-compose run --rm dddesign bash -c "{command}"')
+
+
+def linters():
+    _run_command_container(
+        "ruff . --config ruff.toml --fix && echo 'Ruff check completed' "
+        '&& ruff format . --config ruff.toml '
+        '&& mypy --config mypy.toml'
+    )
 
 
 def shell():
-    local('docker-compose run --rm runner-linters bash -c "python -m IPython"')
+    _run_command_container('python -m IPython')
 
 
 def bash():
-    local('docker-compose run --rm runner-linters bash')
+    _run_command_container('bash')
 
 
 def kill():

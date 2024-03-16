@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-    runner-linters:
+    dddesign:
         build:
             context: ./
             dockerfile: ./Dockerfile
@@ -9,4 +9,3 @@ services:
                 PYTHONBREAKPOINT: import ipdb;ipdb.set_trace
         volumes:
             - .:/src
-        command: bash -c "ruff . --config ruff.toml --fix && echo 'Ruff check completed' && ruff format . --config ruff.toml && mypy --config mypy.toml"
