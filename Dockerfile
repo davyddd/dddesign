@@ -12,8 +12,5 @@ RUN poetry config virtualenvs.create false
 
 WORKDIR /src
 
-COPY ./requirements.dev.txt /src
-RUN pip install -r requirements.dev.txt
-
 COPY . /src
 RUN poetry install

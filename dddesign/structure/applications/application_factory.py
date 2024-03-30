@@ -55,8 +55,8 @@ class ApplicationDependencyMapper(BaseModel):
         arbitrary_types_allowed = True
 
     @staticmethod
-    def _get_enum_class(mapping: Dict[RequestAttributeValue, DependencyValue]) -> Type[BaseEnum]:
-        return next(iter(mapping.keys())).__class__
+    def _get_enum_class(request_attribute_value_map: Dict[RequestAttributeValue, DependencyValue]) -> Type[BaseEnum]:
+        return next(iter(request_attribute_value_map.keys())).__class__
 
     @property
     def enum_class(self) -> Type[BaseEnum]:
@@ -89,7 +89,6 @@ class ApplicationFactory(BaseModel, Generic[ApplicationT]):
 
     class Config:
         allow_mutation = False
-        arbitrary_types_allowed = True
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
