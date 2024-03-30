@@ -21,6 +21,10 @@ def linters():
     )
 
 
+def tests():
+    _run_command_container('pytest')
+
+
 def shell():
     _run_command_container('python -m IPython')
 

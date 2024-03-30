@@ -23,6 +23,7 @@ class TestApplication(TestCase):
 
         # Act & Assert
         try:
+
             class ExampleApp(Application):
                 some_field: Custom
         except RuntimeError:

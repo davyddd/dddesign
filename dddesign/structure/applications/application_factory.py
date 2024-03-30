@@ -10,6 +10,7 @@ from dddesign.structure.infrastructure.adapters.internal import InternalAdapter
 from dddesign.structure.infrastructure.repositories import Repository
 from dddesign.structure.services.service import Service
 from dddesign.utils.convertors import convert_camel_case_to_snake_case
+from dddesign.utils.type_helpers import is_subclass_smart
 
 ApplicationT = TypeVar('ApplicationT')
 
@@ -52,7 +53,6 @@ class ApplicationDependencyMapper(BaseModel):
 
     class Config:
         allow_mutation = False
-        arbitrary_types_allowed = True
 
     @staticmethod
     def _get_enum_class(request_attribute_value_map: Dict[RequestAttributeValue, DependencyValue]) -> Type[BaseEnum]:
@@ -71,7 +71,11 @@ class ApplicationDependencyMapper(BaseModel):
             raise ValueError('`request_attribute_value_map` must contain at least one element')
 
         enum_class = cls._get_enum_class(request_attribute_value_map)
-        if set(enum_class) ^ set(request_attribute_value_map.keys()):
+        if not is_subclass_smart(enum_class, BaseEnum):
+            raise ValueError('All keys of `request_attribute_value_map` must be instances of `BaseEnum`')
+        elif not all(isinstance(key, enum_class) for key in request_attribute_value_map):
+            raise ValueError('All keys of `request_attribute_value_map` must be instances of the same enum class')
+        elif set(enum_class) ^ set(request_attribute_value_map.keys()):
             raise ValueError(
                 f'All elements of `{enum_class.__name__}` enum must announced as key in `request_attribute_value_map` attribute'
             )
