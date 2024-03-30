@@ -22,7 +22,7 @@ class TestApplicationDependencyMapper(TestCase):
     def test_correct_state(self):
         # Act
         instance = ApplicationDependencyMapper(
-            application_attribute_name='external_adapter',
+            application_attribute_name='external_adapter_class',
             request_attribute_value_map={FirstTestEnum.VALUE1: ExternalAdapter, FirstTestEnum.VALUE2: ExternalAdapter},
         )
 
@@ -36,7 +36,7 @@ class TestApplicationDependencyMapper(TestCase):
         # Act & Assert
         with self.assertRaises(ValidationError):
             ApplicationDependencyMapper(
-                application_attribute_name='external_adapter',
+                application_attribute_name='external_adapter_class',
                 request_attribute_value_map={'incorrect_request_attribute_value': ExternalAdapter},
             )
 
@@ -44,7 +44,7 @@ class TestApplicationDependencyMapper(TestCase):
         # Act & Assert
         with self.assertRaises(ValidationError):
             ApplicationDependencyMapper(
-                application_attribute_name='external_adapter',
+                application_attribute_name='external_adapter_class',
                 request_attribute_value_map={FirstTestEnum.VALUE1: ExternalAdapter, SecondTestEnum.VALUE1: ExternalAdapter},
             )
 
@@ -52,6 +52,6 @@ class TestApplicationDependencyMapper(TestCase):
         # Act & Assert
         with self.assertRaises(ValidationError):
             ApplicationDependencyMapper(
-                application_attribute_name='external_adapter',
+                application_attribute_name='external_adapter_class',
                 request_attribute_value_map={FirstTestEnum.VALUE1: ExternalAdapter},
             )
