@@ -40,7 +40,7 @@ class TestApplicationDependencyMapper(TestCase):
                 request_attribute_value_map={'incorrect_request_attribute_value': ExternalAdapter},
             )
 
-    def test_different_request_attribute_value_type(self):
+    def test_another_types_request_attribute_values(self):
         # Act & Assert
         with self.assertRaises(ValidationError):
             ApplicationDependencyMapper(
@@ -48,7 +48,7 @@ class TestApplicationDependencyMapper(TestCase):
                 request_attribute_value_map={FirstTestEnum.VALUE1: ExternalAdapter, SecondTestEnum.VALUE1: ExternalAdapter},
             )
 
-    def test_not_enough_request_attribute_value(self):
+    def test_not_enough_request_attribute_values(self):
         # Act & Assert
         with self.assertRaises(ValidationError):
             ApplicationDependencyMapper(
