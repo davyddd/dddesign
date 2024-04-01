@@ -9,6 +9,7 @@ from dddesign.structure.infrastructure.adapters.external import ExternalAdapter
 from dddesign.structure.infrastructure.adapters.internal import InternalAdapter
 from dddesign.structure.infrastructure.repositories import Repository
 from dddesign.structure.services.service import Service
+from dddesign.utils.base_model import create_pydantic_error_instance
 from dddesign.utils.convertors import convert_camel_case_to_snake_case
 from dddesign.utils.type_helpers import is_subclass_smart
 
@@ -76,11 +77,19 @@ class ApplicationDependencyMapper(BaseModel):
     @validator('request_attribute_value_map')
     def validate_request_attribute_value_map(cls, request_attribute_value_map):
         if len(request_attribute_value_map) == 0:
-            raise ValueError('`request_attribute_value_map` must contain at least one element')
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='empty_request_attribute_value_map',
+                msg_template='`request_attribute_value_map` must contain at least one element',
+            )
 
         enum_class = cls._get_enum_class(request_attribute_value_map)
         if not is_subclass_smart(enum_class, BaseEnum):
-            raise ValueError('All keys of `request_attribute_value_map` must be instances of `BaseEnum`')
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='incorrect_request_attribute_value',
+                msg_template='All keys of `request_attribute_value_map` must be instances of `BaseEnum`',
+            )
         elif not all(isinstance(key, enum_class) for key in request_attribute_value_map):
             raise ValueError('All keys of `request_attribute_value_map` must be instances of the same enum class')
         elif set(enum_class) ^ set(request_attribute_value_map.keys()):
