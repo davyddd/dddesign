@@ -26,6 +26,7 @@ DependencyValue = Union[
     Type[Application],
     Type[Service],
 ]
+DEPENDENCY_VALUE_TYPES = tuple(_v for _v in getattr(DependencyValue, '__args__', ()) if isinstance(_v, type))
 
 RequestAttributeName = str
 RequestAttributeValue = Any
@@ -48,7 +49,7 @@ class RequestAttribute(NamedTuple):
 
 class ApplicationDependencyMapper(BaseModel):
     request_attribute_name: Optional[RequestAttributeName] = None
-    request_attribute_value_map: Dict[RequestAttributeValue, DependencyValue]
+    request_attribute_value_map: Dict[RequestAttributeValue, Any]
     application_attribute_name: str
 
     class Config:
@@ -65,6 +66,13 @@ class ApplicationDependencyMapper(BaseModel):
     def get_request_attribute_name(self) -> RequestAttributeName:
         return self.request_attribute_name or convert_camel_case_to_snake_case(self.enum_class.__name__)
 
+    @staticmethod
+    def _is_dependency_value(value: Any) -> bool:
+        if isinstance(value, type):
+            return is_subclass_smart(value, *DEPENDENCY_VALUE_TYPES)
+        else:
+            return isinstance(value, DEPENDENCY_VALUE_TYPES)
+
     @validator('request_attribute_value_map')
     def validate_request_attribute_value_map(cls, request_attribute_value_map):
         if len(request_attribute_value_map) == 0:
@@ -79,6 +87,28 @@ class ApplicationDependencyMapper(BaseModel):
             raise ValueError(
                 f'All elements of `{enum_class.__name__}` enum must announced as key in `request_attribute_value_map` attribute'
             )
+        elif any(not cls._is_dependency_value(value) for value in request_attribute_value_map.values()):
+            raise ValueError('All values of `request_attribute_value_map` must be instances of `DependencyValue`')
+
+        dependency_values = tuple(request_attribute_value_map.values())
+        if dependency_values:
+            amount_equal_values = 0
+            first_dependency_value = dependency_values[0]
+            for dependency_value in dependency_values[1:]:
+                if dependency_value != first_dependency_value:
+                    break
+
+                if (
+                    not isinstance(dependency_value, type)
+                    and dependency_value == first_dependency_value
+                    and dependency_value.__class__ != first_dependency_value.__class__
+                ):
+                    break
+
+                amount_equal_values += 1
+
+            if amount_equal_values == len(dependency_values) - 1:
+                raise ValueError('`request_attribute_value_map` must contain more than one unique value')
         return request_attribute_value_map
 
 

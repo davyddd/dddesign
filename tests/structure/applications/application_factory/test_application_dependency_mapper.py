@@ -18,12 +18,23 @@ class SecondTestEnum(str, BaseEnum):
     VALUE2 = 'value2'
 
 
+class Test1ExternalAdapter(ExternalAdapter):
+    pass
+
+
+class Test2ExternalAdapter(ExternalAdapter):
+    pass
+
+
 class TestApplicationDependencyMapper(TestCase):
     def test_correct_state(self):
         # Act
         instance = ApplicationDependencyMapper(
-            application_attribute_name='external_adapter_class',
-            request_attribute_value_map={FirstTestEnum.VALUE1: ExternalAdapter, FirstTestEnum.VALUE2: ExternalAdapter},
+            application_attribute_name='external_adapter',
+            request_attribute_value_map={
+                FirstTestEnum.VALUE1: Test1ExternalAdapter(),
+                FirstTestEnum.VALUE2: Test2ExternalAdapter(),
+            },
         )
 
         # Assert
@@ -31,6 +42,28 @@ class TestApplicationDependencyMapper(TestCase):
         self.assertEqual(instance.get_request_attribute_name(), 'first_test_enum')
         with self.assertRaises(TypeError):
             instance.application_attribute_name = 'new value'
+
+    def test_incorrect_type_dependency_value(self):
+        # Act & Assert
+        with self.assertRaises(ValidationError):
+            ApplicationDependencyMapper(
+                application_attribute_name='external_adapter_class',
+                request_attribute_value_map={
+                    FirstTestEnum.VALUE1: 'incorrect_dependency_value',
+                    FirstTestEnum.VALUE2: Test1ExternalAdapter(),
+                },
+            )
+
+    def test_not_unique_dependency_values(self):
+        # Act & Assert
+        with self.assertRaises(ValidationError):
+            ApplicationDependencyMapper(
+                application_attribute_name='external_adapter_class',
+                request_attribute_value_map={
+                    FirstTestEnum.VALUE1: Test1ExternalAdapter,
+                    FirstTestEnum.VALUE2: Test1ExternalAdapter,
+                },
+            )
 
     def test_incorrect_request_attribute_value(self):
         # Act & Assert
