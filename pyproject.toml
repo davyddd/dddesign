@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "dddesign"
 description = "Domain Driven Design Library"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["davyddd"]
 readme = "README.md"
 packages = [{include = "dddesign"}]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.11"
+python = ">=3.8"
 pydantic = "^1.10"
 
 [tool.poetry.group.dev.dependencies]
