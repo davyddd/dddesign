@@ -6,7 +6,7 @@ authors = ["davyddd"]
 license = "MIT"
 repository = "https://github.com/davyddd/dddesign"
 readme = "README.md"
-keywords = ["python", "ddd", "domain driven design", "dddesign"]
+keywords = ["python", "ddd", "domain driven design", "ddd architecture", "ddd structure", "architecture", "structure", "dddesign"]
 packages = [{include = "dddesign"}]
 
 [tool.poetry.dependencies]
