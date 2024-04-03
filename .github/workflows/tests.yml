@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+    workflow_run:
+        workflows: [ "Linters" ]
+        types:
+            - completed
+
+jobs:
+    lint:
+        runs-on: ubuntu-20.04
+        strategy:
+            matrix:
+                python-version: [ 3.8, 3.9, 3.10 ]
+                pydantic-version: [ 1.10 ]
+        steps:
+          -   uses: actions/checkout@v4.1.1
+          -   name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v5.1.0
+              with:
+                  python-version: ${{ matrix.python-version }}
+          -   name: Install Pydantic ${{ matrix.pydantic-version }}
+              run: pip install pydantic==${{ matrix.pydantic-version }}
+          -   name: Install Pytest
+              run: pip install pytest==8.1.1
+          -   name: Tests
+              run: pytest
