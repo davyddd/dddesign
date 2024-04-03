@@ -1,9 +1,12 @@
 [tool.poetry]
 name = "dddesign"
 description = "Domain Driven Design Library"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["davyddd"]
+license = "MIT"
+repository = "https://github.com/davyddd/dddesign"
 readme = "README.md"
+keywords = ["python", "ddd", "domain driven design", "dddesign"]
 packages = [{include = "dddesign"}]
 
 [tool.poetry.dependencies]
