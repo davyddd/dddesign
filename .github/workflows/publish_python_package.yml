@@ -5,7 +5,7 @@ on:
         types: [ published ]
 
 jobs:
-    build-and-publish-packege:
+    build-and-publish-package:
         runs-on: ubuntu-20.04
         environment:
             name: pypi
@@ -25,4 +25,4 @@ jobs:
             -   name: Build release distributions
                 run: poetry build
             -   name: Publish release distributions
-                uses: pypa/gh-action-pypi-publish@1.8.14
+                uses: pypa/gh-action-pypi-publish@release/v1
