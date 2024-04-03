@@ -91,13 +91,26 @@ class ApplicationDependencyMapper(BaseModel):
                 msg_template='All keys of `request_attribute_value_map` must be instances of `BaseEnum`',
             )
         elif not all(isinstance(key, enum_class) for key in request_attribute_value_map):
-            raise ValueError('All keys of `request_attribute_value_map` must be instances of the same enum class')
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='another_types_request_attribute_values',
+                msg_template='All keys of `request_attribute_value_map` must be instances of the same enum class',
+            )
         elif set(enum_class) ^ set(request_attribute_value_map.keys()):
-            raise ValueError(
-                f'All elements of `{enum_class.__name__}` enum must announced as key in `request_attribute_value_map` attribute'
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='not_enough_request_attribute_values',
+                msg_template=(
+                    f'All elements of `{enum_class.__name__}` enum must announced '
+                    'as key in `request_attribute_value_map` attribute'
+                ),
             )
         elif any(not cls._is_dependency_value(value) for value in request_attribute_value_map.values()):
-            raise ValueError('All values of `request_attribute_value_map` must be instances of `DependencyValue`')
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='incorrect_type_dependency_value',
+                msg_template='All values of `request_attribute_value_map` must be instances of `DependencyValue`',
+            )
 
         dependency_values = tuple(request_attribute_value_map.values())
         if dependency_values:
@@ -117,7 +130,11 @@ class ApplicationDependencyMapper(BaseModel):
                 amount_equal_values += 1
 
             if amount_equal_values == len(dependency_values) - 1:
-                raise ValueError('`request_attribute_value_map` must contain more than one unique value')
+                raise create_pydantic_error_instance(
+                    base_error=ValueError,
+                    code='not_unique_dependency_values',
+                    msg_template='`request_attribute_value_map` must contain more than one unique value',
+                )
         return request_attribute_value_map
 
 
