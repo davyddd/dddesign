@@ -32,11 +32,30 @@ jobs:
                     else
                         echo "Version $PACKAGE_VERSION doesn't exists"
                     fi
+    linters:
+        runs-on: ubuntu-20.04
+        steps:
+            -   uses: actions/checkout@v4.1.1
+            -   uses: ./.github/actions/linters
+    tests:
+        runs-on: ubuntu-20.04
+        strategy:
+            matrix:
+                python-version: [ "3.8", "3.9", "3.10" ]
+                pydantic-version: [ "1.10" ]
+        steps:
+            -   uses: actions/checkout@v4.1.1
+            -   uses: ./.github/actions/tests
+                with:
+                    python-version: ${{ matrix.python-version }}
+                    pydantic-version: ${{ matrix.pydantic-version }}
     build-and-publish-package:
         runs-on: ubuntu-20.04
         needs:
             - check-tag-from-main-branch
             - check-version-already-exist
+            - linters
+            - tests
         environment:
             name: pypi
             url: https://pypi.org/p/dddesign

@@ -1,0 +1,21 @@
+name: Tests
+inputs:
+    python-version:
+        required: true
+        description: 'Python version'
+    pydantic-version:
+        required: true
+        description: 'Pydantic version'
+runs:
+    using: "composite"
+    steps:
+        -   name: Set up Python ${{ inputs.python-version }}
+            uses: actions/setup-python@v5.1.0
+            with:
+                python-version: ${{ inputs.python-version }}
+        -   name: Install Pydantic ${{ inputs.pydantic-version }}
+            run: pip install pydantic==${{ inputs.pydantic-version }}
+        -   name: Install Pytest
+            run: pip install pytest==8.1.1
+        -   name: Tests
+            run: pytest
