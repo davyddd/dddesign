@@ -102,7 +102,7 @@ jobs:
             -   name: Publish release distributions
                 uses: pypa/gh-action-pypi-publish@release/v1
     github-release:
-        name: Sign the Python distribution with Sigstore and upload them to GitHub Release
+        name: Sign the dists and create GitHub Release
         needs:
             - publish-package
         runs-on: ubuntu-20.04
