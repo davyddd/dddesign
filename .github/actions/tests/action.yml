@@ -14,7 +14,7 @@ runs:
             with:
                 python-version: ${{ inputs.python-version }}
         -   name: Install Pydantic ${{ inputs.pydantic-version }}
-            run: pip install pydantic==${{ inputs.pydantic-version }}
+            run: pip install pydantic[email]==${{ inputs.pydantic-version }}
             shell: bash
         -   name: Install Pytest
             run: pip install pytest==8.1.1
