@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "dddesign"
 description = "Domain Driven Design Library"
-version = "0.0.5"
+version = "0.0.6"
 authors = ["davyddd"]
 license = "MIT"
 repository = "https://github.com/davyddd/dddesign"
@@ -12,6 +12,7 @@ packages = [{include = "dddesign"}]
 [tool.poetry.dependencies]
 python = ">=3.8"
 pydantic = {version = "^1.10", extras = ["email"]}
+email-validator = "*"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "1.1.1"
