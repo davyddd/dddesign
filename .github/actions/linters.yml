@@ -1,0 +1,21 @@
+name: Linters
+runs:
+    using: "composite"
+    steps:
+        -   name: Set up Python
+            uses: actions/setup-python@v5.1.0
+            with:
+                python-version: 3.10.4
+        -   name: Install Poetry
+            uses: snok/install-poetry@v1.3.4
+            with:
+                version: 1.5.0
+                virtualenvs-create: false
+        -   name: Install dependencies
+            run: poetry install
+        -   name: Ruff Linter
+            run: ruff . --config ruff.toml
+        -   name: Ruff Format Linter
+            run: ruff format . --check --config ruff.toml
+        -   name: Mypy Linter
+            run: mypy --config mypy.toml
