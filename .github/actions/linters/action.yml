@@ -13,9 +13,13 @@ runs:
                 virtualenvs-create: false
         -   name: Install dependencies
             run: poetry install
+            shell: bash
         -   name: Ruff Linter
             run: ruff . --config ruff.toml
+            shell: bash
         -   name: Ruff Format Linter
             run: ruff format . --check --config ruff.toml
+            shell: bash
         -   name: Mypy Linter
             run: mypy --config mypy.toml
+            shell: bash
