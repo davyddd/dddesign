@@ -10,7 +10,7 @@ on:
 jobs:
     build-and-publish-package:
         runs-on: ubuntu-20.04
-        if: startsWith(github.ref, "refs/tags/v")
+        if: startsWith(github.ref, 'refs/tags/v')
         environment:
             name: pypi
             url: https://pypi.org/p/dddesign
