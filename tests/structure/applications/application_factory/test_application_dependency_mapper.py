@@ -18,11 +18,11 @@ class SecondTestEnum(str, BaseEnum):
     SECOND_VALUE2 = 'second_value2'
 
 
-class Test1ExternalAdapter(ExternalAdapter):
+class Example1ExternalAdapter(ExternalAdapter):
     pass
 
 
-class Test2ExternalAdapter(ExternalAdapter):
+class Example2ExternalAdapter(ExternalAdapter):
     pass
 
 
@@ -32,8 +32,8 @@ class TestApplicationDependencyMapper(TestCase):
         instance = ApplicationDependencyMapper(
             application_attribute_name='external_adapter',
             request_attribute_value_map={
-                FirstTestEnum.FIRST_VALUE1: Test1ExternalAdapter(),
-                FirstTestEnum.FIRST_VALUE2: Test2ExternalAdapter(),
+                FirstTestEnum.FIRST_VALUE1: Example1ExternalAdapter(),
+                FirstTestEnum.FIRST_VALUE2: Example2ExternalAdapter(),
             },
         )
 
@@ -50,7 +50,7 @@ class TestApplicationDependencyMapper(TestCase):
                 application_attribute_name='external_adapter_class',
                 request_attribute_value_map={
                     FirstTestEnum.FIRST_VALUE1: 'incorrect_type_dependency_value',
-                    FirstTestEnum.FIRST_VALUE2: Test1ExternalAdapter(),
+                    FirstTestEnum.FIRST_VALUE2: Example1ExternalAdapter(),
                 },
             )
         self.assertEqual(context.exception.errors()[0]['type'], 'value_error.incorrect_type_dependency_value')
@@ -61,8 +61,8 @@ class TestApplicationDependencyMapper(TestCase):
             ApplicationDependencyMapper(
                 application_attribute_name='external_adapter_class',
                 request_attribute_value_map={
-                    FirstTestEnum.FIRST_VALUE1: Test1ExternalAdapter,
-                    FirstTestEnum.FIRST_VALUE2: Test1ExternalAdapter,
+                    FirstTestEnum.FIRST_VALUE1: Example1ExternalAdapter,
+                    FirstTestEnum.FIRST_VALUE2: Example1ExternalAdapter,
                 },
             )
 
