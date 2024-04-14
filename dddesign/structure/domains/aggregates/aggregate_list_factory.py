@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, PrivateAttr, root_validator
 
 from dddesign.structure.domains.aggregates.aggregate import Aggregate
 from dddesign.structure.domains.entities import Entity
+from dddesign.utils.base_model import create_pydantic_error_instance
 from dddesign.utils.type_helpers import get_type_without_optional
 
 RelatedObject = Any
@@ -37,12 +38,15 @@ class AggregateDependencyMapper(BaseModel):
 
     class Config:
         allow_mutation = False
-        arbitrary_types_allowed = True
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
-        self._method_related_object_id_argument = self._get_method_related_object_id_argument()
-        self._related_object_id_attribute_name = self._get_related_object_id_attribute_name()
+        self._method_related_object_id_argument = self._get_method_related_object_id_argument(
+            method_getter=self.method_getter, method_extra_arguments=self.method_extra_arguments
+        )
+        self._related_object_id_attribute_name = self._get_related_object_id_attribute_name(
+            method_getter=self.method_getter, method_related_object_id_argument=self._method_related_object_id_argument
+        )
 
     @property
     def method_related_object_id_argument(self) -> MethodArgument:
@@ -52,30 +56,62 @@ class AggregateDependencyMapper(BaseModel):
     def related_object_id_attribute_name(self) -> str:
         return self._related_object_id_attribute_name
 
-    def _get_method_related_object_id_argument(self) -> MethodArgument:
+    @root_validator
+    def validate_consistency(cls, values):
+        method_getter = values['method_getter']
+        method_extra_arguments = values['method_extra_arguments']
+
+        method_related_object_id_argument = cls._get_method_related_object_id_argument(
+            method_getter=method_getter, method_extra_arguments=method_extra_arguments
+        )
+        cls._get_related_object_id_attribute_name(
+            method_getter=method_getter, method_related_object_id_argument=method_related_object_id_argument
+        )
+
+        return values
+
+    @staticmethod
+    def _get_method_related_object_id_argument(
+        method_getter: Callable, method_extra_arguments: Dict[str, Any]
+    ) -> MethodArgument:
         argument_name, argument_class = None, None
-        for _argument_name, _argument_class in self.method_getter.__annotations__.items():
-            if _argument_name in self.method_extra_arguments or _argument_name == 'return':
+        for _argument_name, _argument_class in method_getter.__annotations__.items():
+            if _argument_name in method_extra_arguments or _argument_name == 'return':
                 continue
 
             if argument_name and argument_class:
-                raise ValueError('Method must have only one related argument')
+                raise create_pydantic_error_instance(
+                    base_error=ValueError,
+                    code='method_getter_have_multiple_related_arguments',
+                    msg_template='`method_getter` must have only one related argument',
+                )
 
             argument_name, argument_class = _argument_name, _argument_class
 
         if not (argument_name and argument_class):
-            raise ValueError('Method must have one related argument')
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='method_getter_not_have_related_argument',
+                msg_template='`method_getter` must have one related argument',
+            )
 
         return MethodArgument.factory(argument_name, argument_class)
 
-    def _get_related_object_id_attribute_name(self) -> str:
-        related_object_class = get_type_without_optional(self.method_getter.__annotations__.get('return'))
+    @staticmethod
+    def _get_related_object_id_attribute_name(
+        method_getter: Callable, method_related_object_id_argument: MethodArgument
+    ) -> str:
+        related_object_class = get_type_without_optional(method_getter.__annotations__.get('return'))
         if not related_object_class:
-            raise ValueError('Method must have return annotation')
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='method_getter_not_have_return_annotation',
+                msg_template='`method_getter` must have return annotation',
+            )
 
-        related_object_id_attribute_class = self._method_related_object_id_argument.argument_class
+        related_object_id_attribute_class = method_related_object_id_argument.argument_class
 
-        if self._method_related_object_id_argument.is_iterable:
+        if method_related_object_id_argument.is_iterable:
             related_object_class = get_type_without_optional(get_args(related_object_class)[0])
             related_object_id_attribute_class = get_type_without_optional(get_args(related_object_id_attribute_class)[0])
 
