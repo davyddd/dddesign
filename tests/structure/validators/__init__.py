@@ -1,2 +1,3 @@
 from .arbitrary_types_allowed_validator import validate_arbitrary_types_allowed
+from .assignment_validator import validate_assignment
 from .immutable_validator import validate_immutable
