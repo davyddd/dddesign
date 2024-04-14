@@ -125,7 +125,6 @@ class AggregateListFactory(BaseModel, Generic[AggregateT]):
 
     class Config:
         allow_mutation = False
-        arbitrary_types_allowed = True
 
     @root_validator
     def validate_consistency(cls, values):
@@ -192,14 +191,15 @@ class AggregateListFactory(BaseModel, Generic[AggregateT]):
         for entity in entities:
             aggregate_init: Dict[str, Any] = {self.aggregate_entity_attribute_name: entity}
             for dependency_item, dependency in enumerate(self.dependency_mappers):
-                if dependency.method_related_object_id_argument.is_iterable:
+                related_object_id = getattr(entity, dependency.entity_attribute_name)
+                if hasattr(related_object_id, '__iter__'):
                     aggregate_init[dependency.aggregate_attribute_name] = tuple(
                         dependency_related_object_map[dependency_item].get(related_object_id)
-                        for related_object_id in getattr(entity, dependency.entity_attribute_name)
+                        for related_object_id in related_object_id
                     )
                 else:
                     aggregate_init[dependency.aggregate_attribute_name] = dependency_related_object_map[dependency_item].get(
-                        getattr(entity, dependency.entity_attribute_name)
+                        related_object_id
                     )
 
             aggregate = self.aggregate_class(**aggregate_init)

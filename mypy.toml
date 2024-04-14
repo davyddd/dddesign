@@ -11,5 +11,6 @@ exclude = [
 [[tool.mypy.overrides]]
 module = [
     'fabric.*',
+    'parameterized.*',
 ]
 ignore_missing_imports = true
