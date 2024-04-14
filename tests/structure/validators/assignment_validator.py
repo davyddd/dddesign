@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import validator, root_validator
+from pydantic import root_validator, validator
 
 
 def validate_assignment(component_class: Any):
@@ -8,11 +8,11 @@ def validate_assignment(component_class: Any):
     class ExampleApp(component_class):
         some_field: str
 
-        @validator('some_field')
+        @validator('some_field', allow_reuse=True)
         def strip_some_field(cls, value):
             return value.strip()
 
-        @root_validator
+        @root_validator(allow_reuse=True)
         def title_some_field(cls, values):
             values['some_field'] = values['some_field'].title()
             return values
