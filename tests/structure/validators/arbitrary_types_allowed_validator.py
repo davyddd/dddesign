@@ -11,5 +11,8 @@ def validate_arbitrary_types_allowed(component_class: Any):
 
         class ExampleApp(component_class):
             some_field: Custom
+
+            def handle(self):
+                pass
     except RuntimeError as error:
         raise AssertionError('arbitrary types are not allowed') from error

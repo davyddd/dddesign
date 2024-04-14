@@ -6,6 +6,9 @@ def validate_immutable(component_class: Any):
     class ExampleApp(component_class):
         some_field: str
 
+        def handle(self):
+            pass
+
     # Act
     instance = ExampleApp(some_field='value')
 
