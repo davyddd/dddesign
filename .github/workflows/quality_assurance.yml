@@ -11,6 +11,13 @@ on:
 jobs:
     linters:
         runs-on: ubuntu-20.04
+        strategy:
+            matrix:
+                command: [
+                    "ruff . --config ruff.toml",
+                    "ruff format . --check --config ruff.toml",
+                    "mypy --config mypy.toml"
+                ]
         steps:
             -   uses: actions/checkout@v4.1.1
             -   uses: ./.github/actions/linters

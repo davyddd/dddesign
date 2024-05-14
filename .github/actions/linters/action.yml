@@ -1,4 +1,8 @@
 name: Linters
+inputs:
+    command:
+        required: true
+        description: 'Running linter command'
 runs:
     using: "composite"
     steps:
@@ -14,12 +18,6 @@ runs:
         -   name: Install dependencies
             run: poetry install --with linter
             shell: bash
-        -   name: Ruff Linter
-            run: ruff . --config ruff.toml
-            shell: bash
-        -   name: Ruff Format Linter
-            run: ruff format . --check --config ruff.toml
-            shell: bash
-        -   name: Mypy Linter
-            run: mypy --config mypy.toml
+        -   name: Run Linter
+            run: ${{ inputs.command }}
             shell: bash
