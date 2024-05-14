@@ -12,7 +12,7 @@ runs:
                 version: 1.5.0
                 virtualenvs-create: false
         -   name: Install dependencies
-            run: poetry install
+            run: poetry install --with linter
             shell: bash
         -   name: Ruff Linter
             run: ruff . --config ruff.toml
