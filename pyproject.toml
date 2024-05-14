@@ -11,6 +11,7 @@ packages = [{include = "dddesign"}]
 
 [tool.poetry.dependencies]
 python = ">=3.8"
+idna = "^3.7"
 pydantic = {version = "^1.10", extras = ["email"]}
 
 [tool.poetry.group.dev.dependencies]
