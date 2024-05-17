@@ -10,6 +10,7 @@ from dddesign.utils.type_helpers import get_python_type
 
 class TestGetPythonType(TestCase):
     def test_basic_python_types(self):
+        # Act & Assert
         self.assertEqual(get_python_type(str), str)
         self.assertEqual(get_python_type(bool), bool)
         self.assertEqual(get_python_type(int), int)
@@ -28,11 +29,13 @@ class TestGetPythonType(TestCase):
         self.assertEqual(get_python_type(IPv6Address), IPv6Address)
 
     def test_optional_type(self):
+        # Act & Assert
         self.assertEqual(get_python_type(Optional[int]), int)
         self.assertEqual(get_python_type(Optional[str]), str)
         self.assertEqual(get_python_type(Optional[datetime]), datetime)
 
     def test_union_type(self):
+        # Act & Assert
         self.assertEqual(get_python_type(Union[int, None]), int)
         self.assertEqual(get_python_type(Union[None, int]), int)
         self.assertEqual(get_python_type(Union[str, None]), str)
@@ -41,13 +44,16 @@ class TestGetPythonType(TestCase):
         self.assertEqual(get_python_type(Union[None, datetime]), datetime)
 
     def test_nested_optional_type(self):
+        # Act & Assert
         self.assertEqual(get_python_type(Optional[Optional[int]]), int)
         self.assertEqual(get_python_type(Optional[Optional[datetime]]), datetime)
 
     def test_nested_union_type(self):
+        # Act & Assert
         self.assertEqual(get_python_type(Union[None, Union[None, int]]), int)
         self.assertEqual(get_python_type(Union[None, Union[None, datetime]]), datetime)
 
     def test_unknown_type(self):
+        # Act & Assert
         with self.assertRaises(TypeError):
             get_python_type(frozenset)
