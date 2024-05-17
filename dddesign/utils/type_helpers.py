@@ -6,7 +6,9 @@ from types import CodeType, FunctionType
 from typing import Any, Callable, Optional, Type, Union, get_args
 from uuid import UUID
 
-PythonType = Union[str, float, bool, bytes, int, dict, date, time, datetime, timedelta, UUID, Decimal, IPv4Address, IPv6Address]
+PythonType = Union[
+    str, bool, int, float, bytes, tuple, list, dict, date, time, datetime, timedelta, UUID, Decimal, IPv4Address, IPv6Address
+]
 
 
 def is_subclass_smart(class_type: Any, *base_types: Any) -> bool:
@@ -15,7 +17,12 @@ def is_subclass_smart(class_type: Any, *base_types: Any) -> bool:
 
 
 def get_type_without_optional(class_type: Any) -> Any:
-    return get_args(class_type)[0] if type(None) in get_args(class_type) else class_type
+    if type(None) in get_args(class_type) and len(get_args(class_type)) == 2:  # noqa: PLR2004
+        for arg in get_args(class_type):
+            if arg is not type(None):
+                return arg
+    else:
+        return class_type
 
 
 def get_origin_class_of_method(cls: Any, method_name: str):
@@ -32,10 +39,14 @@ def get_python_type(type_) -> Type[PythonType]:
     if hasattr(type_, '__supertype__'):
         return get_python_type(type_.__supertype__)
     elif hasattr(type_, '__origin__'):
-        return get_python_type(type_.__args__[0])
-    elif hasattr(type_, '__bases__'):
+        return get_python_type(get_type_without_optional(type_))
+    elif getattr(type_, '__bases__', None):
         next_type = type_.__bases__[0]
-        if _is_python_type(type_) and not _is_python_type(next_type):
+        if (
+            type_ is bool  # because bool is a subclass of int
+            or type_ is datetime  # because datetime is a subclass of date
+            or (_is_python_type(type_) and not _is_python_type(next_type))
+        ):
             return type_
         else:
             return get_python_type(next_type)
