@@ -2,7 +2,7 @@ import inspect
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from ipaddress import IPv4Address, IPv6Address
-from types import CodeType, FunctionType
+from types import CellType, CodeType, FunctionType
 from typing import Any, Callable, Optional, Type, Union, get_args
 from uuid import UUID
 
@@ -75,4 +75,7 @@ def get_new_function(func: Callable, new_name: Optional[str] = None) -> Callable
         base_code.co_freevars,
         base_code.co_cellvars,
     )
-    return FunctionType(new_code, func.__globals__)
+    closure = func.__closure__
+    if closure:
+        closure = tuple(CellType(cell.cell_contents) for cell in closure)
+    return FunctionType(new_code, func.__globals__, func_name, func.__defaults__, closure)
