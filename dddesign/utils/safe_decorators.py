@@ -12,7 +12,9 @@ def safe_call(
     exceptions: Tuple[Type[Exception], ...] = (Exception,),
 ) -> Callable:
     if func is None:
-        return lambda _func: safe_call(func=_func, capture_exception=capture_exception, default_result=default_result)
+        return lambda _func: safe_call(
+            func=_func, capture_exception=capture_exception, default_result=default_result, exceptions=exceptions
+        )
 
     @wraps(func)
     def wrapped_func(*args, **kwargs):
@@ -33,7 +35,7 @@ def retry_once_after_exception(
     func: Optional[Callable] = None, capture_exception: bool = True, exceptions: Tuple[Type[Exception], ...] = (Exception,)
 ) -> Callable:
     if func is None:
-        return lambda _func: retry_once_after_exception(func=_func, exceptions=exceptions)
+        return lambda _func: retry_once_after_exception(func=_func, capture_exception=capture_exception, exceptions=exceptions)
 
     @wraps(func)
     def wrapped_func(*args, **kwargs):
