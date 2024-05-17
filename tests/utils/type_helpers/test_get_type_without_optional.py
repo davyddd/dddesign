@@ -20,8 +20,11 @@ class TestGetTypeWithoutOptional(TestCase):
     def test_union_with_none(self):
         # Act & Assert
         self.assertEqual(get_type_without_optional(Union[int, None]), int)
+        self.assertEqual(get_type_without_optional(Union[None, int]), int)
         self.assertEqual(get_type_without_optional(Union[str, None]), str)
+        self.assertEqual(get_type_without_optional(Union[None, str]), str)
         self.assertEqual(get_type_without_optional(Union[List[int], None]), List[int])
+        self.assertEqual(get_type_without_optional(Union[None, List[int]]), List[int])
 
     def test_union_without_none(self):
         # Act & Assert
