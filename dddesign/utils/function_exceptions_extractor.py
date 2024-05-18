@@ -49,25 +49,36 @@ class ExceptionInfo(BaseModel):
         return self.exception_class(**kwargs)
 
 
+def _get_node_name(node: ast.AST) -> str:
+    if isinstance(node, ast.Name):
+        return node.id
+    elif isinstance(node, ast.Attribute):
+        return f'{_get_node_name(node.value)}.{node.attr}'
+    elif isinstance(node, ast.Call):
+        return _get_node_name(node.func)
+    else:
+        raise TypeError(f'Unsupported node type: {type(node)}')
+
+
 def extract_function_exceptions(func: Callable) -> Generator[ExceptionInfo, None, None]:
     source = textwrap.dedent(inspect.getsource(func))
     tree = ast.parse(source)
 
     for node in ast.walk(tree):
         if isinstance(node, ast.Raise):
-            exception_name: Optional[str] = None
-            exception_args: Tuple[Any, ...] = ()
-            exception_kwargs: Dict[str, Any] = {}
+            if node.exc is None:
+                continue
+
+            try:
+                exception_name: str = _get_node_name(node.exc)
+                exception_args: Tuple[Any, ...] = ()
+                exception_kwargs: Dict[str, Any] = {}
+            except TypeError:
+                continue
 
             if isinstance(node.exc, ast.Call):
-                exception_name = ast.unparse(node.exc.func)
                 exception_args = tuple(node.exc.args)
                 exception_kwargs = {kw.arg: kw.value for kw in node.exc.keywords if isinstance(kw.arg, str)}
-            elif isinstance(node.exc, (ast.Attribute, ast.Name)):
-                exception_name = ast.unparse(node.exc)
-
-            if not exception_name:
-                continue
 
             exception_name_slices = exception_name.split('.')
             class_name = exception_name_slices[-1]
