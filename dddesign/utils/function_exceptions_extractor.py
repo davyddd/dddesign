@@ -9,19 +9,24 @@ from pydantic import BaseModel, Field, validator
 
 from dddesign.utils.module_getter import get_module
 
+UNDEFINED_VALUE = object()
+
 
 class ExceptionInfo(BaseModel):
     exception_class: Type[Exception]
     args: Tuple[Any, ...] = Field(default_factory=tuple)
     kwargs: Dict[str, Any] = Field(default_factory=dict)
 
+    class Config:
+        allow_mutation = False
+
     @validator('args')
     def validate_args(cls, value):
-        return tuple(_v.value if isinstance(_v, ast.Constant) else None for _v in value)
+        return tuple(_v.value if isinstance(_v, ast.Constant) else UNDEFINED_VALUE for _v in value)
 
     @validator('kwargs')
     def validate_kwargs(cls, value):
-        return {_k: _v.value if isinstance(_v, ast.Constant) else None for _k, _v in value.items()}
+        return {_k: _v.value if isinstance(_v, ast.Constant) else UNDEFINED_VALUE for _k, _v in value.items()}
 
     def get_kwargs(self):
         annotations = tuple(
@@ -29,14 +34,18 @@ class ExceptionInfo(BaseModel):
             for argument_name in inspect.signature(self.exception_class.__init__).parameters
             if argument_name not in ('self', 'args', 'kwargs')
         )
-
-        return {
+        kwargs = {
             **{attribute_name: self.args[item] for item, attribute_name in enumerate(annotations[: len(self.args)])},
-            **self.kwargs,
+            **{_k: _v for _k, _v in self.kwargs.items() if _k in annotations},
         }
+        for annotation in annotations:
+            if annotation not in kwargs:
+                kwargs[annotation] = UNDEFINED_VALUE
+
+        return kwargs
 
     def get_exception_instance(self):
-        kwargs = {k: f'<{k}>' if v is None else v for k, v in self.get_kwargs().items()}
+        kwargs = {k: f'<{k}>' if v is UNDEFINED_VALUE else v for k, v in self.get_kwargs().items()}
         return self.exception_class(**kwargs)
 
 
