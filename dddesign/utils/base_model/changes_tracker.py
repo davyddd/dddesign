@@ -2,7 +2,7 @@ from typing import Any, Dict, Generator, Optional, Tuple
 
 from pydantic import BaseModel, PrivateAttr
 
-UndefinedValue = object()
+UNDEFINED_VALUE = object()
 
 
 class TrackChangesMixin(BaseModel):
@@ -14,7 +14,7 @@ class TrackChangesMixin(BaseModel):
 
     def _get_changed_fields(self) -> Generator[str, None, None]:
         for field, value in self.dict().items():
-            if self._initial_state.get(field, UndefinedValue) != value:
+            if self._initial_state.get(field, UNDEFINED_VALUE) != value:
                 yield field
 
     @property
