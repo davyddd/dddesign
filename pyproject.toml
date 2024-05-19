@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "dddesign"
 description = "Domain Driven Design Library"
-version = "0.0.7"
+version = "1.0.0"
 authors = ["davyddd"]
 license = "MIT"
 repository = "https://github.com/davyddd/dddesign"
@@ -10,9 +10,9 @@ keywords = ["python", "ddd", "domain driven design", "ddd architecture", "ddd st
 packages = [{include = "dddesign"}]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.8,<3.13"
 idna = "^3.7"
-pydantic = {version = "^1.10", extras = ["email"]}
+pydantic = {version = ">=1.9,<1.11", extras = ["email"]}
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "0.13.9"
