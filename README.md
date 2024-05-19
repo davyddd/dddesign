@@ -1,7 +1,5 @@
 # DDDesign
 
----
-
 [![pypi](https://img.shields.io/pypi/v/dddesign.svg)](https://pypi.python.org/pypi/dddesign)
 [![downloads](https://static.pepy.tech/badge/dddesign/month)](https://pepy.tech/project/dddesign)
 [![versions](https://img.shields.io/pypi/pyversions/dddesign.svg)](https://github.com/davyddd/dddesign)
@@ -13,8 +11,6 @@ This library is built on top of [Pydantic](https://docs.pydantic.dev/latest/),
 ensuring data validation and settings management using Python type annotations.
 
 ## Installation
-
----
 
 Install the library using pip:
 ```bash
