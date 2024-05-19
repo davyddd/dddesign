@@ -38,8 +38,10 @@ class TrackChangesMixin(BaseModel):
         return self._initial_state
 
     def update_initial_state(self, fields: Optional[tuple] = None):
+        _dict = self.dict()
         if fields:
             for field in fields:
-                self._initial_state[field] = self.dict()[field]
+                if field in _dict:
+                    self._initial_state[field] = _dict[field]
         else:
-            self._initial_state = self.dict()
+            self._initial_state = _dict
