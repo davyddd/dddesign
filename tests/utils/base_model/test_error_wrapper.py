@@ -6,7 +6,7 @@ from pydantic import BaseModel, ValidationError, validator
 from pydantic.typing import AnyCallable
 
 from dddesign.structure.domains.constants import BaseEnum
-from dddesign.structure.domains.errors import CollectionError, BaseError
+from dddesign.structure.domains.errors import BaseError, CollectionError
 from dddesign.structure.domains.types import BaseType
 from dddesign.utils.base_model import create_pydantic_error_instance, wrap_error
 from dddesign.utils.base_model.error_wrapper import CONTEXT_MESSAGES_PARAM
