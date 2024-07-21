@@ -6,7 +6,7 @@ from tests.structure.validators import validate_arbitrary_types_allowed, validat
 
 class TestRepository(TestCase):
     def test_immutable(self):
-        validate_immutable(Repository)
+        validate_immutable(Repository, 'get')
 
     def test_arbitrary_types_allowed(self):
-        validate_arbitrary_types_allowed(Repository)
+        validate_arbitrary_types_allowed(Repository, 'get')

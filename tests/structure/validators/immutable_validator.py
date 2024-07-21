@@ -1,13 +1,17 @@
 from typing import Any
 
 
-def validate_immutable(component_class: Any):
-    # Arrange
-    class ExampleApp(component_class):
-        some_field: str
+def method(self):  # noqa: ARG001
+    pass
 
-        def handle(self):
-            pass
+
+def validate_immutable(component_class: Any, method_name: str = 'handle'):
+    # Arrange
+    ExampleApp = type(  # noqa: N806
+        'ExampleApp',
+        (component_class,),
+        {'some_field': (str, ...), '__annotations__': {'some_field': str}, method_name: method},
+    )
 
     # Act
     instance = ExampleApp(some_field='value')
