@@ -1,6 +1,6 @@
 from typing import Any, Dict, Generic, NamedTuple, Optional, Tuple, Type, TypeVar, Union
 
-from pydantic import BaseModel, PrivateAttr, root_validator, validator
+from pydantic import BaseModel, ConfigDict, PrivateAttr, root_validator, validator
 
 from dddesign.structure.applications import Application
 from dddesign.structure.domains.constants import BaseEnum
@@ -49,12 +49,11 @@ class RequestAttribute(NamedTuple):
 
 
 class ApplicationDependencyMapper(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     request_attribute_name: Optional[RequestAttributeName] = None
     request_attribute_value_map: Dict[RequestAttributeValue, Any]
     application_attribute_name: str
-
-    class Config:
-        frozen = True
 
     @staticmethod
     def _get_enum_class(request_attribute_value_map: Dict[RequestAttributeValue, DependencyValue]) -> Type[BaseEnum]:

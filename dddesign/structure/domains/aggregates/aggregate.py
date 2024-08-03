@@ -1,7 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class Aggregate(BaseModel):
-    class Config:
-        validate_assignment = True
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(validate_assignment=True, arbitrary_types_allowed=True)

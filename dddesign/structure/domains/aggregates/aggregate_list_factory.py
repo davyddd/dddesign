@@ -1,6 +1,6 @@
 from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple, Tuple, Type, TypeVar, get_args
 
-from pydantic import BaseModel, Field, PrivateAttr, root_validator
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, root_validator
 
 from dddesign.structure.domains.aggregates.aggregate import Aggregate
 from dddesign.structure.domains.entities import Entity
@@ -27,6 +27,8 @@ class MethodArgument(NamedTuple):
 
 
 class AggregateDependencyMapper(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     entity_attribute_name: str
     aggregate_attribute_name: str
 
@@ -35,9 +37,6 @@ class AggregateDependencyMapper(BaseModel):
 
     _method_related_object_id_argument: MethodArgument = PrivateAttr()
     _related_object_id_attribute_name: str = PrivateAttr()
-
-    class Config:
-        frozen = True
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
@@ -119,12 +118,11 @@ class AggregateDependencyMapper(BaseModel):
 
 
 class AggregateListFactory(BaseModel, Generic[AggregateT]):
+    model_config = ConfigDict(frozen=True)
+
     aggregate_class: Type[AggregateT]
     aggregate_entity_attribute_name: str
     dependency_mappers: Tuple[AggregateDependencyMapper, ...]
-
-    class Config:
-        frozen = True
 
     @root_validator
     def validate_consistency(cls, values):

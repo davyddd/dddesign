@@ -1,7 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ExternalAdapter(BaseModel):
-    class Config:
-        frozen = True
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
