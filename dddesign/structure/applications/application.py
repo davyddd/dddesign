@@ -3,5 +3,5 @@ from pydantic import BaseModel
 
 class Application(BaseModel):
     class Config:
-        allow_mutation = False
+        frozen = True
         arbitrary_types_allowed = True

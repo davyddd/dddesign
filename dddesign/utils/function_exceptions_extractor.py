@@ -18,7 +18,7 @@ class ExceptionInfo(BaseModel):
     kwargs: Dict[str, Any] = Field(default_factory=dict)
 
     class Config:
-        allow_mutation = False
+        frozen = True
 
     @validator('args')
     def validate_args(cls, value):

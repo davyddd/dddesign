@@ -37,7 +37,7 @@ class AggregateDependencyMapper(BaseModel):
     _related_object_id_attribute_name: str = PrivateAttr()
 
     class Config:
-        allow_mutation = False
+        frozen = True
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
@@ -124,7 +124,7 @@ class AggregateListFactory(BaseModel, Generic[AggregateT]):
     dependency_mappers: Tuple[AggregateDependencyMapper, ...]
 
     class Config:
-        allow_mutation = False
+        frozen = True
 
     @root_validator
     def validate_consistency(cls, values):

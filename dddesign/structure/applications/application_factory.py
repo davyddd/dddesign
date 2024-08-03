@@ -54,7 +54,7 @@ class ApplicationDependencyMapper(BaseModel):
     application_attribute_name: str
 
     class Config:
-        allow_mutation = False
+        frozen = True
 
     @staticmethod
     def _get_enum_class(request_attribute_value_map: Dict[RequestAttributeValue, DependencyValue]) -> Type[BaseEnum]:
