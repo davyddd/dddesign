@@ -1,6 +1,7 @@
 from typing import Optional
 
 from pydantic import ValidationError
+from pydantic.errors import PydanticErrorMixin
 
 from dddesign.structure.domains.errors import BaseError, CollectionError
 
@@ -14,13 +15,19 @@ def wrap_error(error: ValidationError) -> CollectionError:
     errors = CollectionError()
 
     for _error in error.errors():
-        field_name: Optional[str] = '.'.join(str(item) for item in _error['loc'])
-        if field_name == '__root_validator__':
-            field_name = None
+        field_name: Optional[str] = '.'.join(str(item) for item in _error['loc']) or None
 
-        if 'ctx' in _error and CONTEXT_MESSAGES_PARAM in _error['ctx']:
-            for msg in _error['ctx'][CONTEXT_MESSAGES_PARAM]:
-                errors.add(BaseError(message=msg, field_name=field_name))
+        original_error: Optional[Exception] = _error.get('ctx', {}).get('error')
+        if original_error:
+            if isinstance(original_error, PydanticErrorMixin):
+                messages = getattr(original_error, CONTEXT_MESSAGES_PARAM, None)
+                if isinstance(messages, list):
+                    for message in messages:
+                        errors.add(BaseError(message=message, field_name=field_name))
+                else:
+                    errors.add(BaseError(message=original_error.message, field_name=field_name))
+            else:
+                errors.add(BaseError(message=str(original_error), field_name=field_name))
         else:
             errors.add(BaseError(message=_error['msg'], field_name=field_name))
 

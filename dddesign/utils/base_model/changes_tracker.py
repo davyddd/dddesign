@@ -13,7 +13,7 @@ class TrackChangesMixin(BaseModel):
         self.update_initial_state()
 
     def _get_changed_fields(self) -> Generator[str, None, None]:
-        for field, value in self.dict().items():
+        for field, value in self.model_dump().items():
             if self._initial_state.get(field, UNDEFINED_VALUE) != value:
                 yield field
 
@@ -31,14 +31,15 @@ class TrackChangesMixin(BaseModel):
 
     @property
     def diffs(self) -> Dict[str, Tuple[Any, Any]]:
-        return {field: (self._initial_state[field], getattr(self, field, None)) for field in self._get_changed_fields()}
+        _dict = self.model_dump()
+        return {field: (self._initial_state[field], _dict[field]) for field in self._get_changed_fields()}
 
     @property
     def initial_state(self) -> Dict[str, Any]:
         return self._initial_state
 
     def update_initial_state(self, fields: Optional[tuple] = None):
-        _dict = self.dict()
+        _dict = self.model_dump()
         if fields:
             for field in fields:
                 if field in _dict:

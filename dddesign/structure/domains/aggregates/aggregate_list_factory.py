@@ -1,6 +1,6 @@
 from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple, Tuple, Type, TypeVar, get_args
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, root_validator
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 
 from dddesign.structure.domains.aggregates.aggregate import Aggregate
 from dddesign.structure.domains.entities import Entity
@@ -55,19 +55,16 @@ class AggregateDependencyMapper(BaseModel):
     def related_object_id_attribute_name(self) -> str:
         return self._related_object_id_attribute_name
 
-    @root_validator
-    def validate_consistency(cls, values):
-        method_getter = values['method_getter']
-        method_extra_arguments = values['method_extra_arguments']
-
-        method_related_object_id_argument = cls._get_method_related_object_id_argument(
-            method_getter=method_getter, method_extra_arguments=method_extra_arguments
+    @model_validator(mode='after')
+    def validate_consistency(self):
+        method_related_object_id_argument = self._get_method_related_object_id_argument(
+            method_getter=self.method_getter, method_extra_arguments=self.method_extra_arguments
         )
-        cls._get_related_object_id_attribute_name(
-            method_getter=method_getter, method_related_object_id_argument=method_related_object_id_argument
+        self._get_related_object_id_attribute_name(
+            method_getter=self.method_getter, method_related_object_id_argument=method_related_object_id_argument
         )
 
-        return values
+        return self
 
     @staticmethod
     def _get_method_related_object_id_argument(
@@ -82,7 +79,7 @@ class AggregateDependencyMapper(BaseModel):
                 raise create_pydantic_error_instance(
                     base_error=ValueError,
                     code='method_getter_have_multiple_related_arguments',
-                    msg_template='`method_getter` must have only one related argument',
+                    message='`method_getter` must have only one related argument',
                 )
 
             argument_name, argument_class = _argument_name, _argument_class
@@ -91,7 +88,7 @@ class AggregateDependencyMapper(BaseModel):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='method_getter_not_have_related_argument',
-                msg_template='`method_getter` must have one related argument',
+                message='`method_getter` must have one related argument',
             )
 
         return MethodArgument.factory(argument_name, argument_class)
@@ -105,7 +102,7 @@ class AggregateDependencyMapper(BaseModel):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='method_getter_not_have_return_annotation',
-                msg_template='`method_getter` must have return annotation',
+                message='`method_getter` must have return annotation',
             )
 
         related_object_id_attribute_class = method_related_object_id_argument.argument_class
@@ -124,24 +121,23 @@ class AggregateListFactory(BaseModel, Generic[AggregateT]):
     aggregate_entity_attribute_name: str
     dependency_mappers: Tuple[AggregateDependencyMapper, ...]
 
-    @root_validator
-    def validate_consistency(cls, values):
-        aggregate_class = values['aggregate_class']
-        aggregate_entity_attribute_name = values['aggregate_entity_attribute_name']
-        dependency_mappers = values['dependency_mappers']
+    @model_validator(mode='after')
+    def validate_consistency(self):
+        if self.aggregate_entity_attribute_name not in self.aggregate_class.__annotations__:
+            raise ValueError(f"The aggregate class doesn't have `{self.aggregate_entity_attribute_name}` attribute")
 
-        if aggregate_entity_attribute_name not in aggregate_class.__annotations__:
-            raise ValueError(f"The aggregate class doesn't have `{aggregate_entity_attribute_name}` attribute")
-
-        if any(dependency.aggregate_attribute_name not in aggregate_class.__annotations__ for dependency in dependency_mappers):
+        if any(
+            dependency.aggregate_attribute_name not in self.aggregate_class.__annotations__
+            for dependency in self.dependency_mappers
+        ):
             raise ValueError("The aggregate class doesn't have a attribute from some declared dependency")
 
-        entity_class = get_type_without_optional(aggregate_class.__annotations__[aggregate_entity_attribute_name])
+        entity_class = get_type_without_optional(self.aggregate_class.__annotations__[self.aggregate_entity_attribute_name])
 
-        if any(dependency.entity_attribute_name not in entity_class.__annotations__ for dependency in dependency_mappers):
+        if any(dependency.entity_attribute_name not in entity_class.__annotations__ for dependency in self.dependency_mappers):
             raise ValueError("The entity class doesn't have a attribute from some declared dependency")
 
-        return values
+        return self
 
     def create_list(self, entities: List[Entity]) -> List[AggregateT]:
         dependency_related_object_ids_map: Dict[int, Tuple[RelatedObjectId, ...]] = {}

@@ -8,5 +8,5 @@ class Entity(BaseModel):
 
     def update(self, data: DataTransferObject):
         for field_name, value in data.dict(exclude_unset=True).items():
-            if field_name in self.__fields__:
+            if field_name in self.model_fields:
                 setattr(self, field_name, value)

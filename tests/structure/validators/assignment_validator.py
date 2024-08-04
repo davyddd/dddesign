@@ -1,21 +1,20 @@
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import root_validator, validator
+from pydantic import AfterValidator, field_validator
 
 
 def validate_assignment(component_class: Any):
     # Arrange
+    def title_some_field(value: str) -> str:
+        return value.title()
+
     class ExampleApp(component_class):
-        some_field: str
+        some_field: Annotated[str, AfterValidator(title_some_field)]
 
-        @validator('some_field', allow_reuse=True)
-        def strip_some_field(cls, value):
+        @field_validator('some_field')
+        @classmethod
+        def strip_some_field(cls, value: str):
             return value.strip()
-
-        @root_validator(allow_reuse=True)
-        def title_some_field(cls, values):
-            values['some_field'] = values['some_field'].title()
-            return values
 
     # Act
     instance = ExampleApp(some_field=' value ')

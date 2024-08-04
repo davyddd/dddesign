@@ -1,6 +1,6 @@
 from typing import Any, Dict, Generic, NamedTuple, Optional, Tuple, Type, TypeVar, Union
 
-from pydantic import BaseModel, ConfigDict, PrivateAttr, root_validator, validator
+from pydantic import BaseModel, ConfigDict, PrivateAttr, field_validator, model_validator
 
 from dddesign.structure.applications import Application
 from dddesign.structure.domains.constants import BaseEnum
@@ -73,13 +73,14 @@ class ApplicationDependencyMapper(BaseModel):
         else:
             return isinstance(value, DEPENDENCY_VALUE_TYPES)
 
-    @validator('request_attribute_value_map')
+    @field_validator('request_attribute_value_map')
+    @classmethod
     def validate_request_attribute_value_map(cls, request_attribute_value_map):
         if len(request_attribute_value_map) == 0:
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='empty_request_attribute_value_map',
-                msg_template='`request_attribute_value_map` must contain at least one element',
+                message='`request_attribute_value_map` must contain at least one element',
             )
 
         enum_class = cls._get_enum_class(request_attribute_value_map)
@@ -87,19 +88,19 @@ class ApplicationDependencyMapper(BaseModel):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='incorrect_request_attribute_value',
-                msg_template='All keys of `request_attribute_value_map` must be instances of `BaseEnum`',
+                message='All keys of `request_attribute_value_map` must be instances of `BaseEnum`',
             )
         elif not all(isinstance(key, enum_class) for key in request_attribute_value_map):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='another_types_request_attribute_values',
-                msg_template='All keys of `request_attribute_value_map` must be instances of the same enum class',
+                message='All keys of `request_attribute_value_map` must be instances of the same enum class',
             )
         elif set(enum_class) ^ set(request_attribute_value_map.keys()):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='not_enough_request_attribute_values',
-                msg_template=(
+                message=(
                     f'All elements of `{enum_class.__name__}` enum must announced '
                     'as key in `request_attribute_value_map` attribute'
                 ),
@@ -108,7 +109,7 @@ class ApplicationDependencyMapper(BaseModel):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='incorrect_type_dependency_value',
-                msg_template='All values of `request_attribute_value_map` must be instances of `DependencyValue`',
+                message='All values of `request_attribute_value_map` must be instances of `DependencyValue`',
             )
 
         dependency_values = tuple(request_attribute_value_map.values())
@@ -132,7 +133,7 @@ class ApplicationDependencyMapper(BaseModel):
                 raise create_pydantic_error_instance(
                     base_error=ValueError,
                     code='not_unique_dependency_values',
-                    msg_template='`request_attribute_value_map` must contain more than one unique value',
+                    message='`request_attribute_value_map` must contain more than one unique value',
                 )
         return request_attribute_value_map
 
@@ -157,45 +158,45 @@ class ApplicationFactory(BaseModel, Generic[ApplicationT]):
             for mapper in self.dependency_mappers
         )
 
-    @validator('dependency_mappers', pre=True)
+    @field_validator('dependency_mappers')
+    @classmethod
     def validate_dependency_mappers(cls, dependency_mappers):
         if len(dependency_mappers) != len({mapper.enum_class for mapper in dependency_mappers}):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='not_unique_enum_classes_in_dependency_mappers',
-                msg_template='`dependency_mappers` must contain unique enum classes',
+                message='`dependency_mappers` must contain unique enum classes',
             )
         elif len(dependency_mappers) != len({mapper.application_attribute_name for mapper in dependency_mappers}):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='not_unique_application_attribute_name_in_dependency_mappers',
-                msg_template='`dependency_mappers` must contain unique `application_attribute_name`',
+                message='`dependency_mappers` must contain unique `application_attribute_name`',
             )
         elif len(dependency_mappers) != len({mapper.get_request_attribute_name() for mapper in dependency_mappers}):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='not_unique_request_attribute_name_in_dependency_mappers',
-                msg_template='`dependency_mappers` must contain unique `request_attribute_name`',
+                message='`dependency_mappers` must contain unique `request_attribute_name`',
             )
 
         return dependency_mappers
 
-    @root_validator
-    def validate_consistency(cls, values):
-        application_class = values['application_class']
-        dependency_mappers = values.get('dependency_mappers', ())
-
-        application_required_attribute_names = {name for name, field in application_class.__fields__.items() if field.required}
-        requested_dependency_attribute_names = {mapper.application_attribute_name for mapper in dependency_mappers}
+    @model_validator(mode='after')
+    def validate_consistency(self):
+        application_required_attribute_names = {
+            name for name, field in self.application_class.model_fields.items() if field.is_required()
+        }
+        requested_dependency_attribute_names = {mapper.application_attribute_name for mapper in self.dependency_mappers}
 
         if not (application_required_attribute_names <= requested_dependency_attribute_names):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='not_enough_dependency_mappers',
-                msg_template='`dependency_mappers` must contain all required attributes of `application_class`',
+                message='`dependency_mappers` must contain all required attributes of `application_class`',
             )
 
-        return values
+        return self
 
     def _get_request_attribute_value_combination(self, **kwargs: RequestAttributeValue) -> RequestAttributeValueCombination:
         request_attribute_value_combination = []

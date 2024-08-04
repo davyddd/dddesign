@@ -5,7 +5,7 @@ import textwrap
 from importlib import import_module
 from typing import Any, Callable, Dict, Generator, Optional, Tuple, Type
 
-from pydantic import BaseModel, ConfigDict, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from dddesign.utils.module_getter import get_module
 
@@ -19,11 +19,13 @@ class ExceptionInfo(BaseModel):
     args: Tuple[Any, ...] = Field(default_factory=tuple)
     kwargs: Dict[str, Any] = Field(default_factory=dict)
 
-    @validator('args')
+    @field_validator('args')
+    @classmethod
     def validate_args(cls, value):
         return tuple(_v.value if isinstance(_v, ast.Constant) else UNDEFINED_VALUE for _v in value)
 
-    @validator('kwargs')
+    @field_validator('kwargs')
+    @classmethod
     def validate_kwargs(cls, value):
         return {_k: _v.value if isinstance(_v, ast.Constant) else UNDEFINED_VALUE for _k, _v in value.items()}
 

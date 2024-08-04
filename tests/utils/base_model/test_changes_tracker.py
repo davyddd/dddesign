@@ -110,8 +110,8 @@ class TestTrackChangesMixin(TestCase):
             self.some_model_instance.diffs,
             {
                 'nested_model_field': (
-                    NestedModel(**self.initial_state['nested_model_field']),
-                    self.some_model_instance.nested_model_field,
+                    self.initial_state['nested_model_field'],
+                    self.some_model_instance.nested_model_field.model_dump(),
                 )
             },
         )
@@ -144,7 +144,7 @@ class TestTrackChangesMixin(TestCase):
         self.some_model_instance.update_initial_state()
 
         # Assert
-        self.assertEqual(self.some_model_instance.initial_state, self.some_model_instance.dict())
+        self.assertEqual(self.some_model_instance.initial_state, self.some_model_instance.model_dump())
         self.assertFalse(self.some_model_instance.has_changed)
         self.assertEqual(self.some_model_instance.changed_fields, ())
         self.assertEqual(self.some_model_instance.changed_data, {})

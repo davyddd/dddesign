@@ -73,8 +73,8 @@ class TestAggregateDependencyMapper(TestCase):
             AggregateDependencyMapper(
                 entity_attribute_name='icon_id', aggregate_attribute_name='icon', method_getter=get_image_without_annotation
             )
-
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.method_getter_not_have_return_annotation')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'method_getter_not_have_return_annotation')
 
     def test_method_getter_have_multiple_related_arguments(self):
         # Act & Assert
@@ -84,8 +84,8 @@ class TestAggregateDependencyMapper(TestCase):
                 aggregate_attribute_name='icon',
                 method_getter=get_image_with_multiple_arguments,
             )
-
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.method_getter_have_multiple_related_arguments')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'method_getter_have_multiple_related_arguments')
 
     def test_method_getter_not_have_related_argument(self):
         # Act & Assert
@@ -93,5 +93,5 @@ class TestAggregateDependencyMapper(TestCase):
             AggregateDependencyMapper(
                 entity_attribute_name='icon_id', aggregate_attribute_name='icon', method_getter=get_image_without_arguments
             )
-
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.method_getter_not_have_related_argument')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'method_getter_not_have_related_argument')

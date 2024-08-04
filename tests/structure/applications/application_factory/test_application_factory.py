@@ -101,8 +101,8 @@ class TestApplicationFactory(TestCase):
         # Act & Assert
         with self.assertRaises(ValidationError) as context:
             ApplicationFactory(application_class=ExampleWithoutDefaultStateApp)
-
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.not_enough_dependency_mappers')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'not_enough_dependency_mappers')
 
     def test_not_enough_dependency_mapper_with_incorrect_application_attribute_name(self):
         # Act & Assert
@@ -119,8 +119,8 @@ class TestApplicationFactory(TestCase):
                     ),
                 ),
             )
-
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.not_enough_dependency_mappers')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'not_enough_dependency_mappers')
 
     def test_not_unique_enum_classes_in_dependency_mappers(self):
         # Act & Assert
@@ -144,8 +144,8 @@ class TestApplicationFactory(TestCase):
                     ),
                 ),
             )
-
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.not_unique_enum_classes_in_dependency_mappers')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'not_unique_enum_classes_in_dependency_mappers')
 
     def test_not_unique_application_attribute_name_in_dependency_mappers(self):
         # Act & Assert
@@ -169,10 +169,8 @@ class TestApplicationFactory(TestCase):
                     ),
                 ),
             )
-
-        self.assertEqual(
-            context.exception.errors()[0]['type'], 'value_error.not_unique_application_attribute_name_in_dependency_mappers'
-        )
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'not_unique_application_attribute_name_in_dependency_mappers')
 
     def test_not_unique_request_attribute_name_in_dependency_mappers(self):
         # Act & Assert
@@ -198,7 +196,5 @@ class TestApplicationFactory(TestCase):
                     ),
                 ),
             )
-
-        self.assertEqual(
-            context.exception.errors()[0]['type'], 'value_error.not_unique_request_attribute_name_in_dependency_mappers'
-        )
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'not_unique_request_attribute_name_in_dependency_mappers')

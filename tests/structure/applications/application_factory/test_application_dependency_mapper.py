@@ -40,8 +40,12 @@ class TestApplicationDependencyMapper(TestCase):
         # Assert
         assert is_subclass_smart(instance.enum_class, FirstTestEnum)
         self.assertEqual(instance.get_request_attribute_name(), 'first_test_enum')
-        with self.assertRaises(TypeError):
+
+        with self.assertRaises(ValidationError) as context:
             instance.application_attribute_name = 'new value'
+        error = context.exception.errors()[0]
+        self.assertEqual(error['type'], 'frozen_instance')
+        self.assertEqual(error['loc'][0], 'application_attribute_name')
 
     def test_incorrect_type_dependency_value(self):
         # Act & Assert
@@ -53,7 +57,8 @@ class TestApplicationDependencyMapper(TestCase):
                     FirstTestEnum.FIRST_VALUE2: Example1ExternalAdapter(),
                 },
             )
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.incorrect_type_dependency_value')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'incorrect_type_dependency_value')
 
     def test_not_unique_dependency_values(self):
         # Act & Assert
@@ -65,8 +70,8 @@ class TestApplicationDependencyMapper(TestCase):
                     FirstTestEnum.FIRST_VALUE2: Example1ExternalAdapter,
                 },
             )
-
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.not_unique_dependency_values')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'not_unique_dependency_values')
 
     def test_incorrect_request_attribute_value(self):
         # Act & Assert
@@ -75,7 +80,8 @@ class TestApplicationDependencyMapper(TestCase):
                 application_attribute_name='external_adapter_class',
                 request_attribute_value_map={'incorrect_request_attribute_value': ExternalAdapter},
             )
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.incorrect_request_attribute_value')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'incorrect_request_attribute_value')
 
     def test_another_types_request_attribute_values(self):
         # Act & Assert
@@ -87,7 +93,8 @@ class TestApplicationDependencyMapper(TestCase):
                     SecondTestEnum.SECOND_VALUE1: ExternalAdapter,
                 },
             )
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.another_types_request_attribute_values')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'another_types_request_attribute_values')
 
     def test_not_enough_request_attribute_values(self):
         # Act & Assert
@@ -96,4 +103,5 @@ class TestApplicationDependencyMapper(TestCase):
                 application_attribute_name='external_adapter_class',
                 request_attribute_value_map={FirstTestEnum.FIRST_VALUE1: ExternalAdapter},
             )
-        self.assertEqual(context.exception.errors()[0]['type'], 'value_error.not_enough_request_attribute_values')
+        error = context.exception.errors()[0]['ctx']['error']
+        self.assertEqual(error.code, 'not_enough_request_attribute_values')

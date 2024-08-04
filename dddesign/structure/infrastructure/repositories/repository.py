@@ -9,10 +9,11 @@ class Repository(BaseModel):
 
     ALLOWED_METHODS: Set[str] = {'get', 'get_list', 'create', 'update', 'delete'}
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
+    @classmethod
+    def __pydantic_init_subclass__(cls, **kwargs):
+        super().__pydantic_init_subclass__(**kwargs)
 
-        allowed_methods = cls.__fields__['ALLOWED_METHODS'].get_default()
+        allowed_methods = cls.model_fields['ALLOWED_METHODS'].get_default()
         methods: Generator[str, ..., ...] = (name for name, member in cls.__dict__.items() if inspect.isfunction(member))
 
         for method in methods:
