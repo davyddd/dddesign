@@ -12,7 +12,7 @@ packages = [{include = "dddesign"}]
 [tool.poetry.dependencies]
 python = ">=3.8,<3.13"
 idna = "^3.7"
-pydantic = ">=2.0,<2.9"
+pydantic = ">=2.1,<2.9"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "0.13.9"
