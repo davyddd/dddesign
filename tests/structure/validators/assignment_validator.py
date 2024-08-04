@@ -1,6 +1,7 @@
-from typing import Annotated, Any
+from typing import Any
 
 from pydantic import AfterValidator, field_validator
+from typing_extensions import Annotated
 
 
 def validate_assignment(component_class: Any):

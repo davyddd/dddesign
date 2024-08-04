@@ -1,7 +1,8 @@
-from typing import Annotated, Any, Dict, List
+from typing import Any, Dict, List
 from unittest import TestCase
 
 from pydantic import AfterValidator, BaseModel, ValidationError, field_validator, model_validator
+from typing_extensions import Annotated
 
 from dddesign.structure.domains.constants import BaseEnum
 from dddesign.structure.domains.errors import BaseError, CollectionError
