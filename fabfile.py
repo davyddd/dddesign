@@ -17,7 +17,7 @@ def linters():
     _run_command_container(
         "ruff . --config ruff.toml --fix && echo 'Ruff check completed'; "
         'ruff format . --config ruff.toml; '
-        'mypy --config mypy.toml'
+        'mypy --config mypy.toml;'
     )
 
 
