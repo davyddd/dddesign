@@ -9,3 +9,4 @@
 .ruff_cache/
 .mypy_cache/
 dist/*
+BACKLOG.MD
