@@ -1,3 +1,4 @@
+from operator import itemgetter
 from typing import Union
 from unittest import TestCase
 
@@ -11,6 +12,9 @@ from tests.utils.annotation_helpers.constants import (
     OPTIONAL_INT_ANNOTATIONS,
 )
 
+FLAT_GENERIC_LIST_ANNOTATIONS = list(map(itemgetter(0), GENERIC_LIST_ANNOTATIONS))
+FLAT_GENERIC_DICT_ANNOTATIONS = list(map(itemgetter(0), GENERIC_DICT_ANNOTATIONS))
+
 
 class TestGetAnnotationWithoutOptional(TestCase):
     @parameterized.expand(OPTIONAL_INT_ANNOTATIONS)
@@ -19,14 +23,18 @@ class TestGetAnnotationWithoutOptional(TestCase):
         self.assertEqual(get_annotation_without_optional(annotation), int)
 
     @parameterized.expand(
-        tuple(zip(tuple(Union[annotation, None] for annotation in GENERIC_LIST_ANNOTATIONS), GENERIC_LIST_ANNOTATIONS))
+        tuple(
+            zip(tuple(Union[annotation, None] for annotation in FLAT_GENERIC_LIST_ANNOTATIONS), FLAT_GENERIC_LIST_ANNOTATIONS)
+        )
     )
     def test_optional_generic_list_annotation(self, annotation, expected_annotation):
         # Act & Assert
         self.assertEqual(get_annotation_without_optional(annotation), expected_annotation)
 
     @parameterized.expand(
-        tuple(zip(tuple(Union[annotation, None] for annotation in GENERIC_DICT_ANNOTATIONS), GENERIC_DICT_ANNOTATIONS))
+        tuple(
+            zip(tuple(Union[annotation, None] for annotation in FLAT_GENERIC_DICT_ANNOTATIONS), FLAT_GENERIC_DICT_ANNOTATIONS)
+        )
     )
     def test_optional_generic_dict_annotation(self, annotation, expected_annotation):
         # Act & Assert
