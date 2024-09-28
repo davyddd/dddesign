@@ -9,7 +9,7 @@ runs:
         -   name: Set up Python
             uses: actions/setup-python@v5.1.0
             with:
-                python-version: 3.10.4
+                python-version: 3.12.6
         -   name: Install Poetry
             uses: snok/install-poetry@v1.3.4
             with:

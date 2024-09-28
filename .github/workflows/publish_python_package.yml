@@ -26,7 +26,7 @@ jobs:
             -   name: Set up Python
                 uses: actions/setup-python@v5.1.0
                 with:
-                    python-version: 3.10.4
+                    python-version: 3.12.6
             -   name: Install Poetry
                 uses: snok/install-poetry@v1.3.4
                 with:
@@ -58,8 +58,8 @@ jobs:
         runs-on: ubuntu-20.04
         strategy:
             matrix:
-                python-version: [ "3.8", "3.11", "3.12" ]
-                pydantic-version: [ "2.8" ]
+                python-version: [ "3.8", "3.9", "3.10" "3.11", "3.12" ]
+                pydantic-version: [ "2.1", "2.8" "2.9" ]
         steps:
             -   uses: actions/checkout@v4.1.1
             -   uses: ./.github/actions/tests
@@ -84,7 +84,7 @@ jobs:
             -   name: Set up Python
                 uses: actions/setup-python@v5.1.0
                 with:
-                    python-version: 3.10.4
+                    python-version: 3.12.6
             -   name: Install Poetry
                 uses: snok/install-poetry@v1.3.4
                 with:
