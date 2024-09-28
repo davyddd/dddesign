@@ -5,7 +5,7 @@ from pydantic import ValidationError
 from dddesign.structure.applications.application_factory import ApplicationDependencyMapper
 from dddesign.structure.domains.constants import BaseEnum
 from dddesign.structure.infrastructure.adapters.external import ExternalAdapter
-from dddesign.utils.type_helpers import is_subclass_smart
+from dddesign.utils.annotation_helpers import is_subclass
 
 
 class FirstTestEnum(str, BaseEnum):
@@ -38,7 +38,7 @@ class TestApplicationDependencyMapper(TestCase):
         )
 
         # Assert
-        assert is_subclass_smart(instance.enum_class, FirstTestEnum)
+        assert is_subclass(instance.enum_class, FirstTestEnum)
         self.assertEqual(instance.get_request_attribute_name(), 'first_test_enum')
 
         with self.assertRaises(ValidationError) as context:

@@ -31,5 +31,6 @@ class TestBaseError(TestCase):
         self.assertEqual(error.field_name, None)
 
     def test_base_error_without_message(self):
+        # Act & Assert
         with self.assertRaises(ValueError):
             BaseError()

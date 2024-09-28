@@ -206,5 +206,6 @@ class TestWrapErrorFunction(TestCase):
         self.assertEqual(ErrorTextEnum.LIST_MUST_HAVE_FIRST_ELEMENT_AS_ONE, collection_error.errors[1].message)
 
     def test_invalid_error(self):
+        # Act & Assert
         with self.assertRaises(TypeError):
             wrap_error(ValueError('This is not a ValidationError'))

@@ -9,9 +9,9 @@ from dddesign.structure.infrastructure.adapters.external import ExternalAdapter
 from dddesign.structure.infrastructure.adapters.internal import InternalAdapter
 from dddesign.structure.infrastructure.repositories import Repository
 from dddesign.structure.services.service import Service
+from dddesign.utils.annotation_helpers import is_subclass
 from dddesign.utils.base_model import create_pydantic_error_instance
 from dddesign.utils.convertors import convert_camel_case_to_snake_case
-from dddesign.utils.type_helpers import is_subclass_smart
 
 ApplicationT = TypeVar('ApplicationT')
 
@@ -69,7 +69,7 @@ class ApplicationDependencyMapper(BaseModel):
     @staticmethod
     def _is_dependency_value(value: Any) -> bool:
         if isinstance(value, type):
-            return is_subclass_smart(value, *DEPENDENCY_VALUE_TYPES)
+            return is_subclass(value, *DEPENDENCY_VALUE_TYPES)
         else:
             return isinstance(value, DEPENDENCY_VALUE_TYPES)
 
@@ -84,7 +84,7 @@ class ApplicationDependencyMapper(BaseModel):
             )
 
         enum_class = cls._get_enum_class(request_attribute_value_map)
-        if not is_subclass_smart(enum_class, BaseEnum):
+        if not is_subclass(enum_class, BaseEnum):
             raise create_pydantic_error_instance(
                 base_error=ValueError,
                 code='incorrect_request_attribute_value',

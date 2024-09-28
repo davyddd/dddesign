@@ -1,29 +1,28 @@
-from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple, Tuple, Type, TypeVar, get_args
+from functools import cached_property
+from typing import Any, Callable, Dict, Generic, List, NamedTuple, Sequence, Tuple, Type, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from dddesign.structure.domains.aggregates.aggregate import Aggregate
+from dddesign.structure.domains.aggregates import Aggregate
 from dddesign.structure.domains.entities import Entity
+from dddesign.utils.annotation_helpers import (
+    get_annotation_origin,
+    get_complex_sequence_element_annotation,
+    get_dict_items_annotation,
+    is_complex_sequence,
+    is_subclass,
+)
 from dddesign.utils.base_model import create_pydantic_error_instance
-from dddesign.utils.type_helpers import get_type_without_optional
+
+AggregateT = TypeVar('AggregateT', bound=Aggregate)
 
 RelatedObject = Any
 RelatedObjectId = Any
 
-AggregateT = TypeVar('AggregateT', bound=Aggregate)
-
 
 class MethodArgument(NamedTuple):
     name: str
-    argument_class: Any
-
-    @classmethod
-    def factory(cls, name: str, argument_class: Any) -> 'MethodArgument':
-        return cls(name, get_type_without_optional(argument_class))
-
-    @property
-    def is_iterable(self) -> bool:
-        return hasattr(getattr(self.argument_class, '__origin__', self.argument_class), '__iter__')
+    annotation: Any
 
 
 class AggregateDependencyMapper(BaseModel):
@@ -35,83 +34,79 @@ class AggregateDependencyMapper(BaseModel):
     method_getter: Callable
     method_extra_arguments: Dict[str, Any] = Field(default_factory=dict)
 
-    _method_related_object_id_argument: MethodArgument = PrivateAttr()
-    _related_object_id_attribute_name: str = PrivateAttr()
+    @cached_property
+    def method_related_argument(self) -> MethodArgument:
+        declared_arguments = {*self.method_extra_arguments.keys(), 'return'}
+        not_declared_arguments = {
+            name: annotation
+            for name, annotation in self.method_getter.__annotations__.items()
+            if name not in declared_arguments
+        }
+        if len(not_declared_arguments) != 1:
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='method_must_have_one_related_argument',
+                message='Method must have one related argument',
+            )
 
-    def __init__(self, **data: Any) -> None:
-        super().__init__(**data)
-        self._method_related_object_id_argument = self._get_method_related_object_id_argument(
-            method_getter=self.method_getter, method_extra_arguments=self.method_extra_arguments
-        )
-        self._related_object_id_attribute_name = self._get_related_object_id_attribute_name(
-            method_getter=self.method_getter, method_related_object_id_argument=self._method_related_object_id_argument
-        )
+        name, annotation = next(iter(not_declared_arguments.items()))
+        if is_subclass(annotation, dict):
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='method_related_argument_must_be_simple_type',
+                message='Method related argument must be a simple type',
+            )
 
-    @property
-    def method_related_object_id_argument(self) -> MethodArgument:
-        return self._method_related_object_id_argument
+        return MethodArgument(name=name, annotation=annotation)
 
-    @property
-    def related_object_id_attribute_name(self) -> str:
-        return self._related_object_id_attribute_name
+    @cached_property
+    def method_return_argument_annotation(self) -> Any:
+        method_return_argument_annotation = self.method_getter.__annotations__.get('return')
+        if method_return_argument_annotation is None:
+            raise create_pydantic_error_instance(
+                base_error=ValueError, code='method_must_have_return_annotation', message='Method must have return annotation'
+            )
+        return method_return_argument_annotation
 
     @model_validator(mode='after')
     def validate_consistency(self):
-        method_related_object_id_argument = self._get_method_related_object_id_argument(
-            method_getter=self.method_getter, method_extra_arguments=self.method_extra_arguments
-        )
-        self._get_related_object_id_attribute_name(
-            method_getter=self.method_getter, method_related_object_id_argument=method_related_object_id_argument
-        )
-
-        return self
-
-    @staticmethod
-    def _get_method_related_object_id_argument(
-        method_getter: Callable, method_extra_arguments: Dict[str, Any]
-    ) -> MethodArgument:
-        argument_name, argument_class = None, None
-        for _argument_name, _argument_class in method_getter.__annotations__.items():
-            if _argument_name in method_extra_arguments or _argument_name == 'return':
-                continue
-
-            if argument_name and argument_class:
+        # wurm up properties because they are cached
+        property_names = ('method_related_argument', 'method_return_argument_annotation')
+        for property_name in property_names:
+            if getattr(self, property_name) is None:
                 raise create_pydantic_error_instance(
                     base_error=ValueError,
-                    code='method_getter_have_multiple_related_arguments',
-                    message='`method_getter` must have only one related argument',
+                    code='property_not_initialized',
+                    message=f'Property `{property_name}` must be initialized',
                 )
 
-            argument_name, argument_class = _argument_name, _argument_class
+        if is_complex_sequence(self.method_related_argument.annotation):
+            # If the method accepts a list of related object IDs,
+            # it should return a map where the key is the ID of the related object
+            try:
+                key_annotation, _ = get_dict_items_annotation(self.method_return_argument_annotation)
+            except TypeError as err:
+                raise create_pydantic_error_instance(
+                    base_error=ValueError,
+                    code='method_return_annotation_must_be_dict',
+                    message='Return annotation of method must be a dict',
+                ) from err
+            except ValueError as err:
+                raise create_pydantic_error_instance(
+                    base_error=ValueError,
+                    code='method_return_annotation_must_have_key',
+                    message='Dict return annotation must have an annotation of key',
+                ) from err
 
-        if not (argument_name and argument_class):
-            raise create_pydantic_error_instance(
-                base_error=ValueError,
-                code='method_getter_not_have_related_argument',
-                message='`method_getter` must have one related argument',
-            )
+            sequence_element_annotation = get_complex_sequence_element_annotation(self.method_related_argument.annotation)
+            if key_annotation != sequence_element_annotation:
+                raise create_pydantic_error_instance(
+                    base_error=ValueError,
+                    code='key_annotation_must_be_the_same_as_method_argument_annotation',
+                    message='Key annotation of dict must be the same as the method argument annotation',
+                )
 
-        return MethodArgument.factory(argument_name, argument_class)
-
-    @staticmethod
-    def _get_related_object_id_attribute_name(
-        method_getter: Callable, method_related_object_id_argument: MethodArgument
-    ) -> str:
-        related_object_class = get_type_without_optional(method_getter.__annotations__.get('return'))
-        if not related_object_class:
-            raise create_pydantic_error_instance(
-                base_error=ValueError,
-                code='method_getter_not_have_return_annotation',
-                message='`method_getter` must have return annotation',
-            )
-
-        related_object_id_attribute_class = method_related_object_id_argument.argument_class
-
-        if method_related_object_id_argument.is_iterable:
-            related_object_class = get_type_without_optional(get_args(related_object_class)[0])
-            related_object_id_attribute_class = get_type_without_optional(get_args(related_object_id_attribute_class)[0])
-
-        return {value: key for key, value in related_object_class.__annotations__.items()}[related_object_id_attribute_class]
+        return self
 
 
 class AggregateListFactory(BaseModel, Generic[AggregateT]):
@@ -124,77 +119,82 @@ class AggregateListFactory(BaseModel, Generic[AggregateT]):
     @model_validator(mode='after')
     def validate_consistency(self):
         if self.aggregate_entity_attribute_name not in self.aggregate_class.__annotations__:
-            raise ValueError(f"The aggregate class doesn't have `{self.aggregate_entity_attribute_name}` attribute")
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='aggregate_class_does_not_have_entity_attribute',
+                message=f'The aggregate class does not have `{self.aggregate_entity_attribute_name}` attribute',
+            )
 
-        if any(
-            dependency.aggregate_attribute_name not in self.aggregate_class.__annotations__
-            for dependency in self.dependency_mappers
-        ):
-            raise ValueError("The aggregate class doesn't have a attribute from some declared dependency")
+        entity_class = get_annotation_origin(self.aggregate_class.__annotations__[self.aggregate_entity_attribute_name])
 
-        entity_class = get_type_without_optional(self.aggregate_class.__annotations__[self.aggregate_entity_attribute_name])
+        for dependency in self.dependency_mappers:
+            if dependency.aggregate_attribute_name not in self.aggregate_class.__annotations__:
+                raise create_pydantic_error_instance(
+                    base_error=ValueError,
+                    code='aggregate_class_does_not_have_attribute',
+                    message=f'The aggregate class does not have `{dependency.aggregate_attribute_name}` attribute',
+                )
 
-        if any(dependency.entity_attribute_name not in entity_class.__annotations__ for dependency in self.dependency_mappers):
-            raise ValueError("The entity class doesn't have a attribute from some declared dependency")
+            if dependency.entity_attribute_name not in entity_class.__annotations__:
+                raise create_pydantic_error_instance(
+                    base_error=ValueError,
+                    code='entity_class_does_not_have_attribute',
+                    message=f'The entity class does not have `{dependency.entity_attribute_name}` attribute',
+                )
+
+            aggregate_target_attribute_annotation = self.aggregate_class.__annotations__[dependency.aggregate_attribute_name]
+            dependency_return_object_annotation = dependency.method_return_argument_annotation
+
+            if is_complex_sequence(dependency.method_related_argument.annotation):
+                _, dependency_return_object_annotation = get_dict_items_annotation(dependency_return_object_annotation)
+
+            if aggregate_target_attribute_annotation != dependency_return_object_annotation:
+                raise create_pydantic_error_instance(
+                    base_error=ValueError,
+                    code='aggregate_attribute_annotation_must_be_the_same_as_method_return_annotation',
+                    message='Aggregate attribute annotation must be the same as the method return annotation',
+                )
 
         return self
 
     def create_list(self, entities: List[Entity]) -> List[AggregateT]:
-        dependency_related_object_ids_map: Dict[int, Tuple[RelatedObjectId, ...]] = {}
-        for dependency_item, dependency in enumerate(self.dependency_mappers):
-            _related_object_ids: List[RelatedObjectId] = []
-            for entity in entities:
-                related_value = getattr(entity, dependency.entity_attribute_name)
-                if isinstance(related_value, Iterable):
-                    _related_object_ids.extend(related_value)
-                else:
-                    _related_object_ids.append(related_value)
-
-            dependency_related_object_ids_map[dependency_item] = tuple(set(_related_object_ids))
-
         dependency_related_object_map: Dict[int, Dict[RelatedObjectId, RelatedObject]] = {}
-        for dependency_item, related_object_ids in dependency_related_object_ids_map.items():
-            dependency = self.dependency_mappers[dependency_item]
-
-            if dependency.method_related_object_id_argument.is_iterable:
-                related_objects = dependency.method_getter(
-                    **{
-                        dependency.method_related_object_id_argument.name: related_object_ids,
-                        **dependency.method_extra_arguments,
+        for dependency_item, dependency in enumerate(self.dependency_mappers):
+            related_objects: Dict[RelatedObjectId, RelatedObject] = {}
+            if is_complex_sequence(dependency.method_related_argument.annotation):
+                annotation_origin = get_annotation_origin(dependency.method_related_argument.annotation)
+                related_object_ids: Sequence[RelatedObjectId] = annotation_origin(
+                    {
+                        related_object_id
+                        for entity in entities
+                        if (
+                            (related_object_id := getattr(entity, dependency.entity_attribute_name))
+                            and related_object_id is not None
+                        )
                     }
                 )
+                related_objects = dependency.method_getter(
+                    **{dependency.method_related_argument.name: related_object_ids, **dependency.method_extra_arguments}
+                )
             else:
-                related_objects = []
-                for related_object_id in related_object_ids:
-                    related_object = dependency.method_getter(
-                        **{
-                            dependency.method_related_object_id_argument.name: related_object_id,
-                            **dependency.method_extra_arguments,
-                        }
-                    )
-                    if related_object is not None:
-                        related_objects.append(related_object)
+                for entity in entities:
+                    related_object_id = getattr(entity, dependency.entity_attribute_name)
+                    if related_object_id is not None and related_object_id not in related_objects:
+                        related_object = dependency.method_getter(
+                            **{dependency.method_related_argument.name: related_object_id, **dependency.method_extra_arguments}
+                        )
+                        related_objects[related_object_id] = related_object
 
-            related_object_map: Dict[RelatedObjectId, RelatedObject] = {
-                getattr(related_object, dependency.related_object_id_attribute_name): related_object
-                for related_object in related_objects
-            }
-            dependency_related_object_map[dependency_item] = related_object_map
+            dependency_related_object_map[dependency_item] = related_objects
 
         aggregates: List[AggregateT] = []
         for entity in entities:
             aggregate_init: Dict[str, Any] = {self.aggregate_entity_attribute_name: entity}
             for dependency_item, dependency in enumerate(self.dependency_mappers):
                 related_object_id = getattr(entity, dependency.entity_attribute_name)
-                if hasattr(related_object_id, '__iter__'):
-                    aggregate_init[dependency.aggregate_attribute_name] = tuple(
-                        dependency_related_object_map[dependency_item].get(related_object_id)
-                        for related_object_id in related_object_id
-                    )
-                else:
-                    aggregate_init[dependency.aggregate_attribute_name] = dependency_related_object_map[dependency_item].get(
-                        related_object_id
-                    )
+                aggregate_init[dependency.aggregate_attribute_name] = dependency_related_object_map[dependency_item].get(
+                    related_object_id
+                )
 
             aggregate = self.aggregate_class(**aggregate_init)
             aggregates.append(aggregate)

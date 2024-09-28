@@ -27,16 +27,19 @@ class TestModuleGetter(TestCase):
         self.assertEqual(get_module(self.root_module, []), self.root_module)
 
     def test_invalid_module_argument(self):
+        # Act & Assert
         with self.assertRaises(ValueError) as cm:
             get_module(None, ['sub_module_1'])
         self.assertEqual(str(cm.exception), 'Argument `module` is required')
 
     def test_invalid_sub_modules_argument(self):
+        # Act & Assert
         with self.assertRaises(ValueError) as cm:
             get_module(self.root_module, 'sub_module_1')
         self.assertEqual(str(cm.exception), 'Argument `sub_modules` must be a list of strings')
 
     def test_non_existent_sub_module(self):
+        # Act & Assert
         with self.assertRaises(ValueError) as cm:
             get_module(self.root_module, ['sub_module_1', 'non_existent'])
         self.assertEqual(str(cm.exception), 'Module non_existent not found in sub_module_1')

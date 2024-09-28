@@ -2,8 +2,8 @@ from unittest.mock import MagicMock as OriginalMagicMock
 
 from pydantic import BaseModel
 
+from dddesign.utils.annotation_helpers import is_subclass
 from dddesign.utils.sequence_helpers import get_safe_element
-from dddesign.utils.type_helpers import is_subclass_smart
 
 
 class MagicMock(OriginalMagicMock):
@@ -15,5 +15,5 @@ class MagicMock(OriginalMagicMock):
             or kwargs.get('spec')
             or kwargs.get('spec_set')
         )
-        if is_subclass_smart(class_type, BaseModel):
+        if is_subclass(class_type, BaseModel):
             self._copy_and_set_values.return_value = self  # some magic
