@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Dict, Generator, Optional, Tuple
 
 from pydantic import BaseModel, PrivateAttr
@@ -13,8 +14,8 @@ class TrackChangesMixin(BaseModel):
         self.update_initial_state()
 
     def _get_changed_fields(self) -> Generator[str, None, None]:
-        for field, value in self.model_dump().items():
-            if self._initial_state.get(field, UNDEFINED_VALUE) != value:
+        for field in self.model_fields:
+            if self._initial_state.get(field, UNDEFINED_VALUE) != getattr(self, field):
                 yield field
 
     @property
@@ -31,18 +32,17 @@ class TrackChangesMixin(BaseModel):
 
     @property
     def diffs(self) -> Dict[str, Tuple[Any, Any]]:
-        _dict = self.model_dump()
-        return {field: (self._initial_state[field], _dict[field]) for field in self._get_changed_fields()}
+        return {field: (self._initial_state[field], getattr(self, field)) for field in self._get_changed_fields()}
 
     @property
     def initial_state(self) -> Dict[str, Any]:
         return self._initial_state
 
     def update_initial_state(self, fields: Optional[tuple] = None):
-        _dict = self.model_dump()
+        model_fields = set(self.model_fields.keys())
         if fields:
             for field in fields:
-                if field in _dict:
-                    self._initial_state[field] = _dict[field]
+                if field in model_fields:
+                    self._initial_state[field] = deepcopy(getattr(self, field))
         else:
-            self._initial_state = _dict
+            self._initial_state = {field: deepcopy(getattr(self, field)) for field in model_fields}

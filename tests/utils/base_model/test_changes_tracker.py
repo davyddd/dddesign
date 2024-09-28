@@ -22,15 +22,15 @@ class SomeModel(TrackChangesMixin, BaseModel):
 
 class TestTrackChangesMixin(TestCase):
     def setUp(self):
-        self.initial_state = {
-            'str_field': 'initial',
-            'int_field': 1,
-            'float_field': 1.0,
-            'dict_field': {'key': 'value'},
-            'list_field': [1, 2, 3],
-            'nested_model_field': {'str_field': 'initial'},
-        }
-        self.some_model_instance = SomeModel(**self.initial_state)
+        self.some_model_instance = SomeModel(
+            str_field='initial',
+            int_field=1,
+            float_field=1.0,
+            dict_field={'key': 'value'},
+            list_field=[1, 2, 3],
+            nested_model_field={'str_field': 'initial'},
+        )
+        self.initial_state = self.some_model_instance.initial_state
 
     def test_without_changes(self):
         # Act & Assert
@@ -108,12 +108,7 @@ class TestTrackChangesMixin(TestCase):
         )
         self.assertEqual(
             self.some_model_instance.diffs,
-            {
-                'nested_model_field': (
-                    self.initial_state['nested_model_field'],
-                    self.some_model_instance.nested_model_field.model_dump(),
-                )
-            },
+            {'nested_model_field': (self.initial_state['nested_model_field'], self.some_model_instance.nested_model_field)},
         )
 
     def test_multiple_changes(self):
@@ -144,7 +139,6 @@ class TestTrackChangesMixin(TestCase):
         self.some_model_instance.update_initial_state()
 
         # Assert
-        self.assertEqual(self.some_model_instance.initial_state, self.some_model_instance.model_dump())
         self.assertFalse(self.some_model_instance.has_changed)
         self.assertEqual(self.some_model_instance.changed_fields, ())
         self.assertEqual(self.some_model_instance.changed_data, {})
