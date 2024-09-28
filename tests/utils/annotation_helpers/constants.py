@@ -1,3 +1,4 @@
+import sys
 from typing import Dict, List, NewType as NewTypeTyping
 
 from typing_extensions import NewType as NewTypeTypingExtensions
@@ -6,40 +7,31 @@ COMMON_PYTHON_TYPES = (bool, int, float, str, tuple, list, dict)
 
 # List annotations
 
-ListAnnotationNative = list[int]
 ListAnnotationNotNative = List[int]
-
-CustomListNativeTyping = NewTypeTyping('CustomListNativeTyping', ListAnnotationNative)
 CustomListNotNativeTyping = NewTypeTyping('CustomListNotNativeTyping', ListAnnotationNotNative)
-
-CustomListNativeTypingExtensions = NewTypeTypingExtensions('CustomListNativeTypingExtensions', ListAnnotationNative)
 CustomListNotNativeTypingExtensions = NewTypeTypingExtensions('CustomListNotNativeTypingExtensions', ListAnnotationNotNative)
 
-GENERIC_LIST_ANNOTATIONS = (
-    ListAnnotationNative,
-    ListAnnotationNotNative,
-    CustomListNativeTyping,
-    CustomListNotNativeTyping,
-    CustomListNativeTypingExtensions,
-    CustomListNotNativeTypingExtensions,
-)
+GENERIC_LIST_ANNOTATIONS = [ListAnnotationNotNative, CustomListNotNativeTyping, CustomListNotNativeTypingExtensions]
+
+if sys.version_info >= (3, 10):
+    ListAnnotationNative = list[int]
+    CustomListNativeTyping = NewTypeTyping('CustomListNativeTyping', ListAnnotationNative)
+    CustomListNativeTypingExtensions = NewTypeTypingExtensions('CustomListNativeTypingExtensions', ListAnnotationNative)
+
+    GENERIC_LIST_ANNOTATIONS += [ListAnnotationNative, CustomListNativeTyping, CustomListNativeTypingExtensions]
 
 # Dict annotations
 
-DictAnnotationNative = dict[str, int]
 DictAnnotationNotNative = Dict[str, int]
-
-CustomDictNativeTyping = NewTypeTyping('CustomDictNativeTyping', DictAnnotationNative)
 CustomDictNotNativeTyping = NewTypeTyping('CustomDictNotNativeTyping', DictAnnotationNotNative)
-
-CustomDictNativeTypingExtensions = NewTypeTypingExtensions('CustomDictNativeTypingExtensions', DictAnnotationNative)
 CustomDictNotNativeTypingExtensions = NewTypeTypingExtensions('CustomDictNotNativeTypingExtensions', DictAnnotationNotNative)
 
-GENERIC_DICT_ANNOTATIONS = (
-    DictAnnotationNative,
-    DictAnnotationNotNative,
-    CustomDictNativeTyping,
-    CustomDictNotNativeTyping,
-    CustomDictNativeTypingExtensions,
-    CustomDictNotNativeTypingExtensions,
-)
+GENERIC_DICT_ANNOTATIONS = [DictAnnotationNotNative, CustomDictNotNativeTyping, CustomDictNotNativeTypingExtensions]
+
+
+if sys.version_info >= (3, 10):
+    DictAnnotationNative = dict[str, int]
+    CustomDictNativeTyping = NewTypeTyping('CustomDictNativeTyping', DictAnnotationNative)
+    CustomDictNativeTypingExtensions = NewTypeTypingExtensions('CustomDictNativeTypingExtensions', DictAnnotationNative)
+
+    GENERIC_DICT_ANNOTATIONS += [DictAnnotationNative, CustomDictNativeTyping, CustomDictNativeTypingExtensions]
