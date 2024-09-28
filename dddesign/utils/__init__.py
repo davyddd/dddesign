@@ -6,4 +6,5 @@ __all__ = (
     'module_getter',
     'sequence_helpers',
     'annotation_helpers',
+    'function_helpers',
 )
