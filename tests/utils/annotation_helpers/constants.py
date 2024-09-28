@@ -1,9 +1,14 @@
 import sys
-from typing import Dict, List, NewType as NewTypeTyping
+from typing import Dict, List, NewType as NewTypeTyping, Optional, Union
 
 from typing_extensions import NewType as NewTypeTypingExtensions
 
 COMMON_PYTHON_TYPES = (bool, int, float, str, tuple, list, dict)
+
+OPTIONAL_INT_ANNOTATIONS = [Optional[int], Union[int, None]]
+
+if sys.version_info >= (3, 10):
+    OPTIONAL_INT_ANNOTATIONS.append(int | None)
 
 # List annotations
 

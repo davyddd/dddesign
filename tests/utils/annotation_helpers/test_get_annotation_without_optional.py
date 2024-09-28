@@ -1,14 +1,19 @@
-from typing import Optional, Union
+from typing import Union
 from unittest import TestCase
 
 from parameterized import parameterized
 
 from dddesign.utils.annotation_helpers import get_annotation_without_optional
-from tests.utils.annotation_helpers.constants import COMMON_PYTHON_TYPES, GENERIC_DICT_ANNOTATIONS, GENERIC_LIST_ANNOTATIONS
+from tests.utils.annotation_helpers.constants import (
+    COMMON_PYTHON_TYPES,
+    GENERIC_DICT_ANNOTATIONS,
+    GENERIC_LIST_ANNOTATIONS,
+    OPTIONAL_INT_ANNOTATIONS,
+)
 
 
 class TestGetAnnotationWithoutOptional(TestCase):
-    @parameterized.expand((int | None, Optional[int], Union[int, None]))
+    @parameterized.expand(OPTIONAL_INT_ANNOTATIONS)
     def test_optional_int_annotation(self, annotation):
         # Act & Assert
         self.assertEqual(get_annotation_without_optional(annotation), int)
