@@ -71,6 +71,9 @@ def get_dict_items_annotation(annotation: Any) -> Tuple[Any, Any]:
 
 
 def get_annotation_without_optional(annotation: Any) -> Any:
+    if annotation is None:
+        return annotation
+
     try:
         get_annotation_origin(annotation)
         return annotation
