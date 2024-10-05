@@ -23,15 +23,7 @@ jobs:
         runs-on: ubuntu-20.04
         steps:
             -   uses: actions/checkout@v4.1.1
-            -   name: Set up Python
-                uses: actions/setup-python@v5.1.0
-                with:
-                    python-version: 3.12.6
-            -   name: Install Poetry
-                uses: snok/install-poetry@v1.3.4
-                with:
-                    version: 1.5.0
-                    virtualenvs-create: false
+            -   uses: ./.github/actions/setup_python_and_poetry
             -   name: Check if version already exists
                 run: |
                     PACKAGE_VERSION=$(poetry version -s)
@@ -52,8 +44,10 @@ jobs:
                     "mypy --config mypy.toml"
                 ]
         steps:
-            -   uses: actions/checkout@v4.1.1
+            -   uses: ./.github/actions/setup_python_and_poetry
             -   uses: ./.github/actions/linters
+                with:
+                    command: ${{ matrix.command }}
     tests:
         runs-on: ubuntu-20.04
         strategy:
@@ -61,10 +55,11 @@ jobs:
                 python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
                 pydantic-version: [ "2.1", "2.8", "2.9" ]
         steps:
-            -   uses: actions/checkout@v4.1.1
-            -   uses: ./.github/actions/tests
+            -   uses: ./.github/actions/setup_python_and_poetry
                 with:
                     python-version: ${{ matrix.python-version }}
+            -   uses: ./.github/actions/tests
+                with:
                     pydantic-version: ${{ matrix.pydantic-version }}
     publish-package:
         runs-on: ubuntu-20.04
@@ -81,15 +76,7 @@ jobs:
             id-token: write
         steps:
             -   uses: actions/checkout@v4.1.1
-            -   name: Set up Python
-                uses: actions/setup-python@v5.1.0
-                with:
-                    python-version: 3.12.6
-            -   name: Install Poetry
-                uses: snok/install-poetry@v1.3.4
-                with:
-                    version: 1.5.0
-                    virtualenvs-create: false
+            -   uses: ./.github/actions/setup_python_and_poetry
             -   name: Build release distributions
                 run: poetry build
             -   name: Publish release distributions

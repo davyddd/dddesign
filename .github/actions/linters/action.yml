@@ -6,15 +6,8 @@ inputs:
 runs:
     using: "composite"
     steps:
-        -   name: Set up Python
-            uses: actions/setup-python@v5.1.0
-            with:
-                python-version: 3.12.6
-        -   name: Install Poetry
-            uses: snok/install-poetry@v1.3.4
-            with:
-                version: 1.5.0
-                virtualenvs-create: false
+        # Must be run after the `setup_python_and_poetry` action.
+        -   uses: actions/checkout@v4.1.1
         -   name: Install dependencies
             run: poetry install --with linter
             shell: bash
