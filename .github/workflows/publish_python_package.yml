@@ -104,3 +104,23 @@ jobs:
                     gh release upload
                     '${{ github.ref_name }}' dist/**
                     --repo '${{ github.repository }}'
+    upload-results-to-codecov:
+        runs-on: ubuntu-20.04
+        needs:
+            - publish-package
+        steps:
+            -   uses: actions/checkout@v4.1.1
+            -   uses: ./.github/actions/setup_python_and_poetry
+            -   name: Install dependencies
+                run: poetry install --with test
+                shell: bash
+            -   name: Tests
+                run: pytest --cov=dddesign --cov-report=xml
+                shell: bash
+            -   name: Upload results to Codecov
+                uses: codecov/codecov-action@v4
+                with:
+                    verbose: true
+                    file: ./coverage.xml
+                    flags: unittests
+                    token: ${{ secrets.CODECOV_TOKEN }}

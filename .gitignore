@@ -9,4 +9,6 @@
 .ruff_cache/
 .mypy_cache/
 dist/*
-BACKLOG.MD
+TODO.md
+.coverage
+coverage.xml
