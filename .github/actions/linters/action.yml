@@ -7,7 +7,6 @@ runs:
     using: "composite"
     steps:
         # Must be run after the `setup_python_and_poetry` action.
-        -   uses: actions/checkout@v4.1.1
         -   name: Install dependencies
             run: poetry install --with linter
             shell: bash
