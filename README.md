@@ -3,6 +3,7 @@
 [![pypi](https://img.shields.io/pypi/v/dddesign.svg)](https://pypi.python.org/pypi/dddesign)
 [![downloads](https://static.pepy.tech/badge/dddesign/month)](https://pepy.tech/project/dddesign)
 [![versions](https://img.shields.io/pypi/pyversions/dddesign.svg)](https://github.com/davyddd/dddesign)
+[![codecov](https://codecov.io/gh/davyddd/dddesign/branch/main/graph/badge.svg)](https://app.codecov.io/github/davyddd/dddesign)
 [![license](https://img.shields.io/github/license/davyddd/dddesign.svg)](https://github.com/davyddd/dddesign/blob/main/LICENSE)
 
 **DDDesign** is a Python library designed to implement Domain-Driven Design (DDD) principles in software projects. 
