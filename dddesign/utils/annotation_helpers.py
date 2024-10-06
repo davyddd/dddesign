@@ -14,7 +14,9 @@ NON_COMPLEX_SEQUENCE_TYPES = (str, bytes, bytearray)
 
 
 def get_annotation_origin(annotation: Any) -> Any:
-    if hasattr(annotation, '__origin__'):
+    if annotation is None:
+        return annotation
+    elif hasattr(annotation, '__origin__'):
         # This is a generic type from the typing module
         # Generic types like List[int], Dict[str, int] have an '__origin__' attribute
         return get_annotation_origin(annotation.__origin__)
@@ -71,9 +73,6 @@ def get_dict_items_annotation(annotation: Any) -> Tuple[Any, Any]:
 
 
 def get_annotation_without_optional(annotation: Any) -> Any:
-    if annotation is None:
-        return annotation
-
     try:
         get_annotation_origin(annotation)
         return annotation
