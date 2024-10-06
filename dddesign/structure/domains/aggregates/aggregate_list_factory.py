@@ -7,6 +7,7 @@ from dddesign.structure.domains.aggregates import Aggregate
 from dddesign.structure.domains.entities import Entity
 from dddesign.utils.annotation_helpers import (
     get_annotation_origin,
+    get_annotation_without_optional,
     get_complex_sequence_element_annotation,
     get_dict_items_annotation,
     is_complex_sequence,
@@ -142,11 +143,15 @@ class AggregateListFactory(BaseModel, Generic[AggregateT]):
                     message=f'The entity class does not have `{dependency.entity_attribute_name}` attribute',
                 )
 
-            aggregate_target_attribute_annotation = self.aggregate_class.__annotations__[dependency.aggregate_attribute_name]
+            aggregate_target_attribute_annotation = get_annotation_without_optional(
+                self.aggregate_class.__annotations__[dependency.aggregate_attribute_name]
+            )
             dependency_return_object_annotation = dependency.method_return_argument_annotation
 
             if is_complex_sequence(dependency.method_related_argument.annotation):
                 _, dependency_return_object_annotation = get_dict_items_annotation(dependency_return_object_annotation)
+
+            dependency_return_object_annotation = get_annotation_without_optional(dependency_return_object_annotation)
 
             if aggregate_target_attribute_annotation != dependency_return_object_annotation:
                 raise create_pydantic_error_instance(
