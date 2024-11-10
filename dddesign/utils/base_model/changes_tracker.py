@@ -7,7 +7,7 @@ UNDEFINED_VALUE = object()
 
 
 class TrackChangesMixin(BaseModel):
-    _initial_state: Dict[str, Any] = PrivateAttr()
+    _initial_state: Dict[str, Any] = PrivateAttr(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)

@@ -144,8 +144,8 @@ class ApplicationFactory(BaseModel, Generic[ApplicationT]):
     reuse_implementations: bool = True
 
     # private attributes
-    _request_attributes: Tuple[RequestAttribute, ...] = PrivateAttr()
-    _application_implementations: Dict[RequestAttributeValueCombination, ApplicationT] = PrivateAttr()
+    _request_attributes: Tuple[RequestAttribute, ...] = PrivateAttr(default_factory=tuple)
+    _application_implementations: Dict[RequestAttributeValueCombination, ApplicationT] = PrivateAttr(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
