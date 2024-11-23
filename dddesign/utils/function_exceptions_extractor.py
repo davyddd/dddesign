@@ -37,19 +37,15 @@ class ExceptionInfo(BaseModel):
     def validate_kwargs(cls, value):
         return {_k: _v.value if isinstance(_v, ast.Constant) else UNDEFINED_VALUE for _k, _v in value.items()}
 
-    def get_kwargs(self):
-        arguments = set()
-        annotations = []
-        for argument, argument_info in inspect.signature(self.exception_class.__init__).parameters.items():
-            if argument in ('self', 'args', 'kwargs'):
-                continue
-
-            arguments.add(argument)
-            annotations.append(Annotation(argument, argument_info.default))
-
+    def get_kwargs(self) -> Dict[str, Any]:
+        annotations = tuple(
+            Annotation(argument, argument_info.default)
+            for argument, argument_info in inspect.signature(self.exception_class.__init__).parameters.items()
+            if argument not in {'self', 'args', 'kwargs'}
+        )
         kwargs = {
             **{annotation.argument: self.args[item] for item, annotation in enumerate(annotations[: len(self.args)])},
-            **{_k: _v for _k, _v in self.kwargs.items() if _k in arguments},
+            **self.kwargs,
         }
         for annotation in annotations:
             if annotation.argument not in kwargs:
@@ -60,16 +56,20 @@ class ExceptionInfo(BaseModel):
                 else:
                     kwargs[annotation.argument] = UNDEFINED_VALUE
 
-        del arguments
         del annotations
 
         return kwargs
 
-    def get_exception_instance(self):
+    def get_exception_instance(self, dry_run: bool = True) -> Optional[Exception]:
         kwargs = {k: f'<{k}>' if v is UNDEFINED_VALUE else v for k, v in self.get_kwargs().items()}
-        return self.exception_class(
-            **kwargs
-        )  # There might be issues with strict typing because UNDEFINED_VALUE is always replaced with a string
+        try:
+            # There might be issues with strict typing because UNDEFINED_VALUE is always replaced with a string
+            return self.exception_class(**kwargs)
+        except Exception as err:  # noqa: BLE001
+            if dry_run:
+                return None
+            else:
+                raise err
 
 
 def _get_node_name(node: ast.AST) -> str:
