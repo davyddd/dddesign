@@ -3,13 +3,21 @@ import builtins
 import inspect
 import textwrap
 from importlib import import_module
-from typing import Any, Callable, Dict, Generator, Optional, Tuple, Type
+from typing import Any, Callable, Dict, Generator, NamedTuple, Optional, Tuple, Type
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from dddesign.utils.module_getter import get_module
 
 UNDEFINED_VALUE = object()
+
+
+class Annotation(NamedTuple):
+    argument: str
+    default_value: Any
+
+    def is_empty(self) -> bool:
+        return self.default_value is inspect._empty
 
 
 class ExceptionInfo(BaseModel):
@@ -30,24 +38,38 @@ class ExceptionInfo(BaseModel):
         return {_k: _v.value if isinstance(_v, ast.Constant) else UNDEFINED_VALUE for _k, _v in value.items()}
 
     def get_kwargs(self):
-        annotations = tuple(
-            argument_name
-            for argument_name in inspect.signature(self.exception_class.__init__).parameters
-            if argument_name not in ('self', 'args', 'kwargs')
-        )
+        arguments = set()
+        annotations = []
+        for argument, argument_info in inspect.signature(self.exception_class.__init__).parameters.items():
+            if argument in ('self', 'args', 'kwargs'):
+                continue
+
+            arguments.add(argument)
+            annotations.append(Annotation(argument, argument_info.default))
+
         kwargs = {
-            **{attribute_name: self.args[item] for item, attribute_name in enumerate(annotations[: len(self.args)])},
-            **{_k: _v for _k, _v in self.kwargs.items() if _k in annotations},
+            **{annotation.argument: self.args[item] for item, annotation in enumerate(annotations[: len(self.args)])},
+            **{_k: _v for _k, _v in self.kwargs.items() if _k in arguments},
         }
         for annotation in annotations:
-            if annotation not in kwargs:
-                kwargs[annotation] = UNDEFINED_VALUE
+            if annotation.argument not in kwargs:
+                if not annotation.is_empty():
+                    kwargs[annotation.argument] = annotation.default_value
+                elif hasattr(self.exception_class, annotation.argument):
+                    kwargs[annotation.argument] = getattr(self.exception_class, annotation.argument)
+                else:
+                    kwargs[annotation.argument] = UNDEFINED_VALUE
+
+        del arguments
+        del annotations
 
         return kwargs
 
     def get_exception_instance(self):
         kwargs = {k: f'<{k}>' if v is UNDEFINED_VALUE else v for k, v in self.get_kwargs().items()}
-        return self.exception_class(**kwargs)
+        return self.exception_class(
+            **kwargs
+        )  # There might be issues with strict typing because UNDEFINED_VALUE is always replaced with a string
 
 
 def _get_node_name(node: ast.AST) -> str:
