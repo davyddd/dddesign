@@ -6,7 +6,6 @@ from dddesign.utils.function_exceptions_extractor import ExceptionInfo
 
 class CustomError(Exception):
     def __init__(self, message: str, code: int):
-        super().__init__(message)
         self.message = message
         self.code = code
 
