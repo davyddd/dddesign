@@ -14,7 +14,7 @@ class TestExceptionInfo(TestCase):
     def test_exception_info_with_standard_exception(self):
         # Arrange
         args = (ast.Constant(value='error message'),)
-        kwargs = {'code': ast.Constant(value=1)}
+        kwargs = {}
 
         # Act
         exception_info = ExceptionInfo(exception_class=ValueError, args=args, kwargs=kwargs)
@@ -23,7 +23,7 @@ class TestExceptionInfo(TestCase):
         # Assert
         self.assertIs(exception_info.exception_class, ValueError)
         self.assertEqual(exception_info.args, ('error message',))
-        self.assertEqual(exception_info.kwargs, {'code': 1})
+        self.assertEqual(exception_info.kwargs, {})
         self.assertIsInstance(exception_instance, ValueError)
 
     def test_exception_info_with_custom_exception(self):
