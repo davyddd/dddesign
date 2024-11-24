@@ -1,11 +1,11 @@
 from typing import Dict, List, NewType
 from unittest import TestCase
 
+from ddutils.annotation_helpers import get_complex_sequence_element_annotation, is_complex_sequence
 from pydantic import ValidationError
 
 from dddesign.structure.domains.aggregates.aggregate_list_factory import AggregateDependencyMapper
 from dddesign.structure.domains.entities import Entity
-from dddesign.utils.annotation_helpers import get_complex_sequence_element_annotation, is_complex_sequence
 
 ImageId = NewType('ImageId', int)
 

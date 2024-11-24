@@ -153,6 +153,17 @@ tomli = {version = "*", optional = true, markers = "python_full_version <= \"3.1
 toml = ["tomli"]
 
 [[package]]
+name = "ddutils"
+version = "0.0.1"
+description = "Domain Driven Utils Library"
+optional = false
+python-versions = "<3.13,>=3.8"
+files = [
+    {file = "ddutils-0.0.1-py3-none-any.whl", hash = "sha256:4de5e104bbd9bde55f6d84fe4313f5980458415f0baf3a83aa5055407073afaa"},
+    {file = "ddutils-0.0.1.tar.gz", hash = "sha256:b5bf385c56eea56942fe32f92b172f85f52f6a590d3971c4d77c161763b07d3c"},
+]
+
+[[package]]
 name = "decorator"
 version = "5.1.1"
 description = "Decorators for Humans"
@@ -791,4 +802,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "064ca2abc38eeee51c90c1bbea6e42e2c164c64e06cbf95ba9558514299bf828"
+content-hash = "3e035af6d40ade7195be2573f4a8fc424ff3efe6ce7235e71d4829cd32437d41"

@@ -1,5 +1,7 @@
 from typing import Any, Dict, Generic, NamedTuple, Optional, Tuple, Type, TypeVar, Union
 
+from ddutils.annotation_helpers import is_subclass
+from ddutils.convertors import convert_camel_case_to_snake_case
 from pydantic import BaseModel, ConfigDict, PrivateAttr, field_validator, model_validator
 
 from dddesign.structure.applications import Application
@@ -9,9 +11,7 @@ from dddesign.structure.infrastructure.adapters.external import ExternalAdapter
 from dddesign.structure.infrastructure.adapters.internal import InternalAdapter
 from dddesign.structure.infrastructure.repositories import Repository
 from dddesign.structure.services.service import Service
-from dddesign.utils.annotation_helpers import is_subclass
 from dddesign.utils.base_model import create_pydantic_error_instance
-from dddesign.utils.convertors import convert_camel_case_to_snake_case
 
 ApplicationT = TypeVar('ApplicationT')
 

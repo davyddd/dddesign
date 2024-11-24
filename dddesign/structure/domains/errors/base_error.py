@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from dddesign.utils.convertors import convert_camel_case_to_snake_case
+from ddutils.convertors import convert_camel_case_to_snake_case
 
 
 class BaseError(Exception):

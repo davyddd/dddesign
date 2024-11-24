@@ -1,11 +1,11 @@
 from unittest import TestCase
 
+from ddutils.annotation_helpers import is_subclass
 from pydantic import ValidationError
 
 from dddesign.structure.applications.application_factory import ApplicationDependencyMapper
 from dddesign.structure.domains.constants import BaseEnum
 from dddesign.structure.infrastructure.adapters.external import ExternalAdapter
-from dddesign.utils.annotation_helpers import is_subclass
 
 
 class FirstTestEnum(str, BaseEnum):

@@ -1,9 +1,8 @@
 from unittest.mock import MagicMock as OriginalMagicMock
 
+from ddutils.annotation_helpers import is_subclass
+from ddutils.sequence_helpers import get_safe_element
 from pydantic import BaseModel
-
-from dddesign.utils.annotation_helpers import is_subclass
-from dddesign.utils.sequence_helpers import get_safe_element
 
 
 class MagicMock(OriginalMagicMock):

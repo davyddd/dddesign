@@ -1,11 +1,7 @@
 from functools import cached_property
 from typing import Any, Callable, Dict, Generic, List, NamedTuple, Sequence, Tuple, Type, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
-
-from dddesign.structure.domains.aggregates import Aggregate
-from dddesign.structure.domains.entities import Entity
-from dddesign.utils.annotation_helpers import (
+from ddutils.annotation_helpers import (
     get_annotation_origin,
     get_annotation_without_optional,
     get_complex_sequence_element_annotation,
@@ -13,6 +9,10 @@ from dddesign.utils.annotation_helpers import (
     is_complex_sequence,
     is_subclass,
 )
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from dddesign.structure.domains.aggregates import Aggregate
+from dddesign.structure.domains.entities import Entity
 from dddesign.utils.base_model import create_pydantic_error_instance
 
 AggregateT = TypeVar('AggregateT', bound=Aggregate)
