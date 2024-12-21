@@ -2,9 +2,10 @@ from typing import Optional, Type, TypeVar
 
 from pydantic.errors import PydanticErrorMixin
 
-from dddesign.utils.base_model.error_wrapper import CONTEXT_MESSAGES_PARAM
-
 BaseError = TypeVar('BaseError', bound=Exception)
+
+
+CONTEXT_MESSAGES_PARAM = '__messages__'
 
 
 def create_pydantic_error_instance(

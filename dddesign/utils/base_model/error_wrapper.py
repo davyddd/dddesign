@@ -4,8 +4,7 @@ from pydantic import ValidationError
 from pydantic.errors import PydanticErrorMixin
 
 from dddesign.structure.domains.errors import BaseError, CollectionError
-
-CONTEXT_MESSAGES_PARAM = '__messages__'
+from dddesign.utils.base_model.error_instance_factory import CONTEXT_MESSAGES_PARAM
 
 
 def wrap_error(error: ValidationError) -> CollectionError:
