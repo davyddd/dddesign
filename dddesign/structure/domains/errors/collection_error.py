@@ -30,3 +30,6 @@ class CollectionError(Exception):
             raise TypeError('`error` must be an instance of `BaseError`')
 
         self.errors.append(error)
+
+
+__all__ = ('CollectionError',)

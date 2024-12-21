@@ -12,3 +12,6 @@ class Entity(BaseModel):
         for field_name, value in data.model_dump(exclude_unset=True, exclude=exclude_fields).items():
             if field_name in self.model_fields:
                 setattr(self, field_name, value)
+
+
+__all__ = ('Entity',)

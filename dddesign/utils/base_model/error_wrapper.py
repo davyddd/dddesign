@@ -31,3 +31,6 @@ def wrap_error(error: ValidationError) -> CollectionError:
             errors.add(BaseError(message=_error['msg'], field_name=field_name))
 
     return errors
+
+
+__all__ = ('wrap_error',)

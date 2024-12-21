@@ -28,3 +28,6 @@ class Repository(BaseModel):
 
             if method not in allowed_methods:
                 raise TypeError(f'Method name `{method}` does not allowed')
+
+
+__all__ = ('Repository', 'BASE_ALLOWED_METHODS')

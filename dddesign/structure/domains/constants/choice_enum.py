@@ -13,3 +13,6 @@ class ChoiceEnum(BaseEnum):
     @classmethod
     def get_choices(cls) -> Tuple[Tuple[Any, str], ...]:
         return tuple((value.value, value.get_title()) for value in cls)
+
+
+__all__ = ('ChoiceEnum',)

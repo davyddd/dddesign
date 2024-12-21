@@ -9,3 +9,6 @@ class Service(BaseModel, metaclass=ABCMeta):
     @abstractmethod
     def handle(self):
         ...
+
+
+__all__ = ('Service',)

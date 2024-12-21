@@ -16,3 +16,6 @@ class MagicMock(OriginalMagicMock):
         )
         if is_subclass(class_type, BaseModel):
             self._copy_and_set_values.return_value = self  # some magic
+
+
+__all__ = ('MagicMock',)

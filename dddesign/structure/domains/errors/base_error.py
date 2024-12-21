@@ -44,3 +44,6 @@ class BaseError(Exception):
     @classmethod
     def get_error_code(cls) -> str:
         return convert_camel_case_to_snake_case(cls.__name__)
+
+
+__all__ = ('BaseError',)
