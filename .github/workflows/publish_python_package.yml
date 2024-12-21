@@ -27,8 +27,8 @@ jobs:
             -   name: Check if version already exists
                 run: |
                     PACKAGE_VERSION=$(poetry version -s)
-                    STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}\n" https://pypi.org/project/dddesign/$PACKAGE_VERSION/)
-                    if [ "$STATUS_CODE" -eq 200 ]; then
+                    PACKAGE_INFO=$(curl -s https://pypi.org/pypi/dddesign/json)
+                    if echo "$PACKAGE_INFO" | grep -q "\"$PACKAGE_VERSION\""; then
                         echo "Version $PACKAGE_VERSION already exists"
                         exit 1
                     else
