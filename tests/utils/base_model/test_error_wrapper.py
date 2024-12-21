@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from unittest import TestCase
 
 from pydantic import AfterValidator, BaseModel, ValidationError, field_validator, model_validator
@@ -33,11 +33,22 @@ def validate_list(value: List[str]) -> List[str]:
     return value
 
 
+class SomeEnum(str, BaseEnum):
+    ONE = 'one'
+    TWO = 'two'
+
+
+class NestedModel(BaseModel):
+    int_field: int
+
+
 class SomeModel(BaseModel):
     two_symbols_field: str
     positive_int_field: int
     dict_key_str_field: Dict[str, Any]
     list_max_two_elements_field: Annotated[List[str], AfterValidator(validate_list)]
+    enum_field: Optional[SomeEnum] = None
+    nested_model_field: Optional[NestedModel] = None
 
     @field_validator('two_symbols_field')
     @classmethod
@@ -65,15 +76,21 @@ class SomeModel(BaseModel):
 
 
 class TestWrapErrorFunction(TestCase):
+    def setUp(self):
+        self.correct_required_fields_data = {
+            'two_symbols_field': 'ab',
+            'positive_int_field': 1,
+            'dict_key_str_field': {},
+            'list_max_two_elements_field': ['one', 'two'],
+        }
+
     def test_field_validator_with_python_error(self):
         # Arrange
         collection_error = None
 
         # Act
         try:
-            SomeModel(
-                two_symbols_field='abc', positive_int_field=1, dict_key_str_field={}, list_max_two_elements_field=['one', 'two']
-            )
+            SomeModel(**{**self.correct_required_fields_data, 'two_symbols_field': 'abc'})
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -93,9 +110,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(
-                two_symbols_field='ab', positive_int_field=-1, dict_key_str_field={}, list_max_two_elements_field=['one', 'two']
-            )
+            SomeModel(**{**self.correct_required_fields_data, 'positive_int_field': -1})
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -115,9 +130,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(
-                two_symbols_field='ab', positive_int_field=2, dict_key_str_field={}, list_max_two_elements_field=['one', 'two']
-            )
+            SomeModel(**{**self.correct_required_fields_data, 'positive_int_field': 2})
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -137,12 +150,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(
-                two_symbols_field='ab',
-                positive_int_field=1,
-                dict_key_str_field={1: 1},
-                list_max_two_elements_field=['one', 'two'],
-            )
+            SomeModel(**{**self.correct_required_fields_data, 'dict_key_str_field': {1: 1}})
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -162,9 +170,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(
-                two_symbols_field='ab', positive_int_field=1, dict_key_str_field={}, list_max_two_elements_field=['one', 2]
-            )
+            SomeModel(**{**self.correct_required_fields_data, 'list_max_two_elements_field': ['one', 2]})
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -185,10 +191,7 @@ class TestWrapErrorFunction(TestCase):
         # Act
         try:
             SomeModel(
-                two_symbols_field='ab',
-                positive_int_field=1,
-                dict_key_str_field={},
-                list_max_two_elements_field=['onee', 'two', 'three'],
+                **{**self.correct_required_fields_data, 'list_max_two_elements_field': ['incorrect_value', 'two', 'three']}
             )
         except ValidationError as e:
             collection_error = wrap_error(e)
@@ -209,3 +212,64 @@ class TestWrapErrorFunction(TestCase):
         # Act & Assert
         with self.assertRaises(TypeError):
             wrap_error(ValueError('This is not a ValidationError'))
+
+    def test_required_fields_error(self):
+        # Arrange
+        collection_error = None
+
+        # Act
+        try:
+            SomeModel()
+        except ValidationError as e:
+            collection_error = wrap_error(e)
+
+        if collection_error is None:
+            raise AssertionError('The `ValidationError` exception was not raised')
+
+        # Assert
+        self.assertIsInstance(collection_error, CollectionError)
+        self.assertEqual(len(collection_error.errors), 4)
+        self.assertTrue(all(isinstance(err, BaseError) for err in collection_error.errors))
+        self.assertSetEqual(
+            set(self.correct_required_fields_data.keys()),
+            {err.field_name for err in collection_error.errors},
+            'The required fields of the model do not match the expected required fields',
+        )
+
+    def test_enum_error(self):
+        # Arrange
+        collection_error = None
+
+        # Act
+        try:
+            SomeModel(**{**self.correct_required_fields_data, 'enum_field': 'incorrect_value'})
+        except ValidationError as e:
+            collection_error = wrap_error(e)
+
+        if collection_error is None:
+            raise AssertionError('The `ValidationError` exception was not raised')
+
+        # Assert
+        self.assertIsInstance(collection_error, CollectionError)
+        self.assertEqual(len(collection_error.errors), 1)
+        self.assertTrue(all(isinstance(err, BaseError) for err in collection_error.errors))
+        self.assertEqual('enum_field', collection_error.errors[0].field_name)
+
+    def test_nested_model_error(self):
+        # Arrange
+        collection_error = None
+
+        # Act
+        try:
+            SomeModel(**{**self.correct_required_fields_data, 'nested_model_field': {'int_field': 'incorrect_value'}})
+        except ValidationError as e:
+            collection_error = wrap_error(e)
+
+        if collection_error is None:
+            raise AssertionError('The `ValidationError` exception was not raised')
+
+        # Assert
+        self.assertIsInstance(collection_error, CollectionError)
+        self.assertEqual(len(collection_error.errors), 1)
+        self.assertTrue(all(isinstance(err, BaseError) for err in collection_error.errors))
+        self.assertEqual('nested_model_field.int_field', collection_error.errors[0].field_name)
