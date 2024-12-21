@@ -243,4 +243,10 @@ class ApplicationFactory(BaseModel, Generic[ApplicationT]):
         return self._get_application_implementation(**kwargs)
 
 
-__all__ = ('ApplicationFactory', 'ApplicationDependencyMapper', 'RequestAttribute', 'RequestAttributeValueError', 'RequestAttributeNotProvideError')
+__all__ = (
+    'ApplicationFactory',
+    'ApplicationDependencyMapper',
+    'RequestAttribute',
+    'RequestAttributeValueError',
+    'RequestAttributeNotProvideError',
+)
