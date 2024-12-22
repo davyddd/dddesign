@@ -1,5 +1,7 @@
 from typing import List
 
+from ddutils.convertors import convert_to_repr
+
 from dddesign.structure.domains.errors.base_error import BaseError
 
 
@@ -8,7 +10,13 @@ class CollectionError(Exception):
 
     def __init__(self):
         self.errors = []
-        self._index = 0
+        self.__index = 0
+
+    def __str__(self) -> str:
+        return repr(self)
+
+    def __repr__(self) -> str:
+        return convert_to_repr(self)
 
     def __bool__(self) -> bool:
         return bool(self.errors)
@@ -17,12 +25,12 @@ class CollectionError(Exception):
         return self
 
     def __next__(self) -> BaseError:
-        if self._index >= len(self.errors):
+        if self.__index >= len(self.errors):
             self._index = 0
             raise StopIteration
 
-        result = self.errors[self._index]
-        self._index += 1
+        result = self.errors[self.__index]
+        self.__index += 1
         return result
 
     def add(self, error: BaseError):

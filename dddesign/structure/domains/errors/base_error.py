@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from ddutils.convertors import convert_camel_case_to_snake_case
+from ddutils.convertors import convert_camel_case_to_snake_case, convert_to_repr
 
 
 class BaseError(Exception):
@@ -29,17 +29,10 @@ class BaseError(Exception):
         self.field_name = field_name or getattr(self, 'field_name', None)
 
     def __str__(self) -> str:
-        return (
-            f'{self.__class__.__name__}(\n'
-            f"    message='{self.message}',\n"
-            f"    error_code='{self.error_code}',\n"
-            f"    status_code='{self.status_code}',\n"
-            f"    field_name='{self.field_name}'\n"
-            ')'
-        )
+        return repr(self)
 
     def __repr__(self) -> str:
-        return self.__str__()
+        return convert_to_repr(self)
 
     @classmethod
     def get_error_code(cls) -> str:
