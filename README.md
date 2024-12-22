@@ -292,6 +292,11 @@ It simplifies the creation of domain-specific exceptions and ensures consistency
 `CollectionError` is an exception class designed to aggregate multiple instances of `BaseError`. 
 It simplifies error handling in scenarios where multiple errors need to be captured and processed together.
 
+### Errors
+
+`Errors` is a Data Transfer Object that transforms a `CollectionError` into a structured format for 4XX HTTP responses. 
+It ensures domain-level errors are serialized and returned to the client in a meaningful way, avoiding 500 responses.
+
 ### wrap_error
 
 `wrap_error` is a utility function designed to convert a Pydantic `ValidationError` into a `CollectionError`, 
