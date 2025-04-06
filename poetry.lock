@@ -11,9 +11,6 @@ files = [
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
 ]
 
-[package.dependencies]
-typing-extensions = {version = ">=4.0.0", markers = "python_version < \"3.9\""}
-
 [[package]]
 name = "appnope"
 version = "0.1.4"
@@ -812,5 +809,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.8,<3.13"
-content-hash = "8a695b6a1b47713d5e91ce3862d32110e32e671307f2e7a99df101d877abbe7a"
+python-versions = ">=3.9,<3.13"
+content-hash = "6a775725cf78efae4e41a5581ebbee8b5bd9484d0ea447bdf020ca944e84667f"
