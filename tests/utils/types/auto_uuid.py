@@ -81,7 +81,7 @@ class AutoUUID(UUID):
         # Import pydantic_core utilities
         from pydantic_core import core_schema
 
-    # Get the core schema for standard UUID, then wrap it with a post-validator
+        # Get the core schema for standard UUID, then wrap it with a post-validator
         base_schema = handler(UUID)  # core schema for a standard UUID
         # After validation, call AutoUUID (cls) to construct our subclass instance
         return core_schema.no_info_after_validator_function(cls, base_schema)
