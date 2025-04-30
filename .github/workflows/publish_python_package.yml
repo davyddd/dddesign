@@ -7,7 +7,7 @@ on:
 
 jobs:
     check-tag-from-main-branch:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         steps:
             -   uses: actions/checkout@v4.1.1
             -   name: Check if tag is on main branch
@@ -20,7 +20,7 @@ jobs:
                         exit 1
                     fi
     check-version-already-exist:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         steps:
             -   uses: actions/checkout@v4.1.1
             -   uses: ./.github/actions/setup_python_and_poetry
@@ -35,7 +35,7 @@ jobs:
                         echo "Version $PACKAGE_VERSION doesn't exists"
                     fi
     linters:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         strategy:
             matrix:
                 command: [
@@ -50,7 +50,7 @@ jobs:
                 with:
                     command: ${{ matrix.command }}
     tests:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         strategy:
             matrix:
                 python-version: [ "3.9", "3.10", "3.11", "3.12" ]
@@ -64,7 +64,7 @@ jobs:
                 with:
                     pydantic-version: ${{ matrix.pydantic-version }}
     publish-package:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         needs:
             - check-tag-from-main-branch
             - check-version-already-exist
@@ -105,7 +105,7 @@ jobs:
                     '${{ github.ref_name }}' dist/**
                     --repo '${{ github.repository }}'
     upload-results-to-codecov:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         needs:
             - publish-package
         steps:
