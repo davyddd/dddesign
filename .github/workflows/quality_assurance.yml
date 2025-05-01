@@ -10,7 +10,7 @@ on:
 
 jobs:
     linters:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         strategy:
             matrix:
                 command: [
@@ -25,7 +25,7 @@ jobs:
                 with:
                     command: ${{ matrix.command }}
     tests:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         strategy:
             matrix:
                 python-version: [ "3.9", "3.10", "3.11", "3.12" ]
