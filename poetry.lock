@@ -151,13 +151,13 @@ toml = ["tomli"]
 
 [[package]]
 name = "ddutils"
-version = "0.0.2"
+version = "0.0.3"
 description = "Domain Driven Utils Library"
 optional = false
 python-versions = "<3.13,>=3.8"
 files = [
-    {file = "ddutils-0.0.2-py3-none-any.whl", hash = "sha256:42c595ea2a3a291c667cebc75c50c26a110814de0f7960888f92822c916d3b6e"},
-    {file = "ddutils-0.0.2.tar.gz", hash = "sha256:622266a56ab366c32ae6d6be5fb018d45fe98ef3a81122c7eb4b1507108b6cee"},
+    {file = "ddutils-0.0.3-py3-none-any.whl", hash = "sha256:cb69113e38cf2d6d3224a53478989b633b3812cf11c751f2dd9862ff17b6237e"},
+    {file = "ddutils-0.0.3.tar.gz", hash = "sha256:7483598b35dce45efa1ef50b0e7cda8a7f0814e2ae53b26455ece5ffa23fd906"},
 ]
 
 [[package]]
@@ -810,4 +810,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "6a775725cf78efae4e41a5581ebbee8b5bd9484d0ea447bdf020ca944e84667f"
+content-hash = "87d383b2817be6543e46f2e2014418027135f04eabf05aaeb76cae943948996c"
