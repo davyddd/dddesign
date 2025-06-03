@@ -13,7 +13,7 @@ packages = [{include = "dddesign"}]
 python = ">=3.9,<3.13"
 idna = "^3.7"
 pydantic = ">=2.1,<2.12"
-setuptools = ">=70.0.0"
+setuptools = ">=78.1.1"
 ddutils = "<0.2.0"
 
 [tool.poetry.group.dev.dependencies]
