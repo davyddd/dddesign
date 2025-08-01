@@ -10,7 +10,7 @@ keywords = ["python", "ddd", "domain driven design", "ddd architecture", "ddd st
 packages = [{include = "dddesign"}]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
+python = ">=3.9,<3.15"
 idna = "^3.7"
 pydantic = ">=2.1,<2.12"
 setuptools = ">=78.1.1"

@@ -11,6 +11,7 @@ runs:
             uses: actions/setup-python@v5.1.0
             with:
                 python-version: ${{ inputs.python-version }}
+                allow-prereleases: true
         -   name: Install Poetry 1.8.3
             uses: snok/install-poetry@v1.3.4
             with:
