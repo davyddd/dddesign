@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "dddesign"
 description = "Domain Driven Design Library"
-version = "1.2.0"
+version = "1.2.0-RC1"
 authors = ["davyddd"]
 license = "MIT"
 repository = "https://github.com/davyddd/dddesign"

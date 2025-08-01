@@ -11,7 +11,7 @@ runs:
             run: poetry install --with test
             shell: bash
         -   name: Install Pydantic ${{ inputs.pydantic-version }}
-            run: pip install pydantic[email]==${{ inputs.pydantic-version }}
+            run: pip install pydantic[email]~=${{ inputs.pydantic-version }}
             shell: bash
         -   name: Tests
             run: pytest
