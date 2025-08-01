@@ -30,6 +30,9 @@ jobs:
             matrix:
                 python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "3.14" ]
                 pydantic-version: [ "2.10", "2.11" ]
+                exclude:
+                    - python-version: 3.14
+                      pydantic-version: 2.10
         steps:
             -   uses: actions/checkout@v4.1.1
             -   uses: ./.github/actions/setup_python_and_poetry
