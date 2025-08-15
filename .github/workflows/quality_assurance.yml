@@ -33,9 +33,6 @@ jobs:
                 exclude:
                     - python-version: "3.13"
                       pydantic-version: "2.1"
-                include:
-                    - python-version: "3.14"
-                      pydantic-version: "2.12.0a1"
         steps:
             -   uses: actions/checkout@v4.1.1
             -   uses: ./.github/actions/setup_python_and_poetry
