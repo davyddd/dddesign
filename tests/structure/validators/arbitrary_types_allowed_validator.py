@@ -7,8 +7,7 @@ def method(self):  # noqa: ARG001
 
 def validate_arbitrary_types_allowed(component_class: Any, method_name: str = 'handle'):
     # Arrange
-    class Custom:
-        ...
+    class Custom: ...
 
     # Act & Assert
     try:

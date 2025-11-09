@@ -9,7 +9,12 @@ exclude = [
     ".ruff_cache",
     ".pytest_cache",
 ]
+line-length = 128
+target-version = "py39"
 
+
+[lint]
+preview = true
 # Avialable rules
 # https://docs.astral.sh/ruff/rules/
 select = [
@@ -36,7 +41,7 @@ select = [
     # Pylint
     "PLC0132", "PLC0208", "PLC3002",
     "PLE0307", "PLE0704",
-    "PLR1701", "PLR1714", "PLR2004",
+    "PLR1714", "PLR2004",
     "PLW0406", "PLW0711",
 ]
 # Conflict rules with format mode (black tool)
@@ -52,23 +57,10 @@ ignore = [
     "Q000", "Q001", "Q002", "Q003",
     # flake8-todos
     "TD003",
+    # pyupgrade
+    "UP006", "UP007", "UP035", "UP045",
 ]
-
-line-length = 128
-
-
-[extend-per-file-ignores]
-"__init__.py" = ["F401"]
-
-
-[lint]
-preview = true
-
-
-[format]
-quote-style = "single"
-indent-style = "space"
-skip-magic-trailing-comma = true
+extend-per-file-ignores = { "__init__.py" = ["F401"] }
 
 
 [lint.isort]
@@ -85,3 +77,9 @@ section-order = [
 
 [lint.flake8-quotes]
 inline-quotes = "single"
+
+
+[format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = true
