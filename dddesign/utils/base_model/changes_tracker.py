@@ -1,5 +1,6 @@
+from collections.abc import Generator
 from copy import deepcopy
-from typing import Any, Dict, Generator, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from pydantic import BaseModel, PrivateAttr
 

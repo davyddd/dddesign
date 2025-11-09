@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Any, Callable, Dict, Generic, List, NamedTuple, Sequence, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, List, NamedTuple, Tuple, Type, TypeVar
 
 from ddutils.annotation_helpers import (
     get_annotation_origin,
@@ -14,6 +14,9 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from dddesign.structure.domains.aggregates import Aggregate
 from dddesign.structure.domains.entities import Entity
 from dddesign.utils.base_model import create_pydantic_error_instance
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 AggregateT = TypeVar('AggregateT', bound=Aggregate)
 
