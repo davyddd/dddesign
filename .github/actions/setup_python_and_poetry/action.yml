@@ -2,7 +2,7 @@ name: Setup Python and Poetry
 inputs:
     python-version:
         required: false
-        default: "3.12.6"
+        default: "3.13.9"
         description: 'Python version'
 runs:
     using: "composite"
@@ -11,8 +11,8 @@ runs:
             uses: actions/setup-python@v5
             with:
                 python-version: ${{ inputs.python-version }}
-        -   name: Install Poetry 1.8.3
-            uses: snok/install-poetry@v1.3.4
+        -   name: Install Poetry 2.2.1
+            uses: snok/install-poetry@v1.4.1
             with:
-                version: 1.8.3
+                version: 2.2.1
                 virtualenvs-create: false
