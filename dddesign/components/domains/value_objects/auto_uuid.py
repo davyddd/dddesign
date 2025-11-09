@@ -84,3 +84,6 @@ class AutoUUID(UUID):
         json_schema = handler(core_schema)
         json_schema.update(type='string', format='uuid')
         return json_schema
+
+
+__all__ = ('AutoUUID',)
