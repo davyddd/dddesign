@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional
 from unittest import TestCase
 
-from pydantic import AfterValidator, BaseModel, ValidationError, field_validator, model_validator
+from pydantic import AfterValidator, BaseModel, Field, ValidationError, field_validator, model_validator
 from typing_extensions import Annotated
 
 from dddesign.structure.domains.constants import BaseEnum
@@ -40,6 +40,10 @@ class SomeEnum(str, BaseEnum):
 
 class NestedModel(BaseModel):
     int_field: int
+
+
+class PatternModel(BaseModel):
+    username: str = Field(pattern=r'^[a-zA-Z0-9_]{1,32}$')
 
 
 class SomeModel(BaseModel):
@@ -254,6 +258,25 @@ class TestWrapErrorFunction(TestCase):
         self.assertEqual(len(collection_error.errors), 1)
         self.assertTrue(all(isinstance(err, BaseError) for err in collection_error.errors))
         self.assertEqual('enum_field', collection_error.errors[0].field_name)
+
+    def test_pattern_constrained_string_field(self):
+        # Arrange
+        collection_error = None
+
+        # Act
+        try:
+            PatternModel(username='!!invalid!!')
+        except ValidationError as e:
+            collection_error = wrap_error(e)
+
+        if collection_error is None:
+            raise AssertionError('The `ValidationError` exception was not raised')
+
+        # Assert
+        self.assertIsInstance(collection_error, CollectionError)
+        self.assertEqual(len(collection_error.errors), 1)
+        self.assertEqual('username', collection_error.errors[0].field_name)
+        self.assertIn('{1,32}', collection_error.errors[0].message)
 
     def test_nested_model_error(self):
         # Arrange

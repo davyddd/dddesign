@@ -1,6 +1,9 @@
+import re
 from typing import Any, Optional
 
 from ddutils.convertors import convert_camel_case_to_snake_case, convert_to_repr
+
+_PLACEHOLDER_RE = re.compile(r'\{([a-zA-Z_][a-zA-Z0-9_]*)\}')
 
 
 class BaseError(Exception):
@@ -20,7 +23,12 @@ class BaseError(Exception):
         message = message or getattr(self, 'message', None)
         if not message:
             raise ValueError('Field `message` is required')
-        self.message = message.format(**kwargs)
+        missing = tuple(name for name in dict.fromkeys(_PLACEHOLDER_RE.findall(message)) if name not in kwargs)
+        if missing:
+            raise ValueError(
+                f'Message contains placeholders {missing} that were not provided as keyword arguments to {type(self).__name__}'
+            )
+        self.message = _PLACEHOLDER_RE.sub(lambda match: str(kwargs[match.group(1)]), message)
 
         self.error_code = error_code or getattr(self, 'error_code', None) or self.get_error_code()
 

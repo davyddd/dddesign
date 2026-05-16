@@ -34,3 +34,23 @@ class TestBaseError(TestCase):
         # Act & Assert
         with self.assertRaises(ValueError):
             BaseError()
+
+    def test_message_with_brace_literals_and_no_kwargs(self):
+        # Act
+        error = BaseError(message="String should match pattern '^[a-zA-Z0-9_]{1,32}$'")
+
+        # Assert
+        self.assertEqual(error.message, "String should match pattern '^[a-zA-Z0-9_]{1,32}$'")
+
+    def test_message_mixes_brace_literal_with_named_placeholder(self):
+        # Act
+        error = BaseError(message='pattern {1,32} and {some_arg}', some_arg='x')
+
+        # Assert
+        self.assertEqual(error.message, 'pattern {1,32} and x')
+
+    def test_missing_placeholder_argument_raises(self):
+        # Act & Assert
+        with self.assertRaises(ValueError) as ctx:
+            BaseError(message='Error message: {error_message} and {some_arg}', error_message='x')
+        self.assertIn('some_arg', str(ctx.exception))
