@@ -10,7 +10,7 @@ exclude = [
     ".pytest_cache",
 ]
 line-length = 128
-target-version = "py39"
+target-version = "py310"
 output-format = "concise"
 
 
