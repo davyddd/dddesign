@@ -19,7 +19,7 @@ jobs:
                     "mypy --config mypy.toml"
                 ]
         steps:
-            -   uses: actions/checkout@v4.1.1
+            -   uses: actions/checkout@v6.0.2
             -   uses: ./.github/actions/setup_python_and_poetry
             -   uses: ./.github/actions/linters
                 with:
@@ -34,7 +34,7 @@ jobs:
                     - python-version: "3.13"
                       pydantic-version: "2.1"
         steps:
-            -   uses: actions/checkout@v4.1.1
+            -   uses: actions/checkout@v6.0.2
             -   uses: ./.github/actions/setup_python_and_poetry
                 with:
                     python-version: ${{ matrix.python-version }}

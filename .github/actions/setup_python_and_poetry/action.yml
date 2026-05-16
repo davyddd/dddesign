@@ -8,7 +8,7 @@ runs:
     using: "composite"
     steps:
         -   name: Set up Python ${{ inputs.python-version }}
-            uses: actions/setup-python@v5
+            uses: actions/setup-python@v6.2.0
             with:
                 python-version: ${{ inputs.python-version }}
         -   name: Install Poetry 2.2.1

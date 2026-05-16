@@ -9,7 +9,7 @@ jobs:
     check-tag-from-main-branch:
         runs-on: ubuntu-24.04
         steps:
-            -   uses: actions/checkout@v4.1.1
+            -   uses: actions/checkout@v6.0.2
             -   name: Check if tag is on main branch
                 run: |
                     git fetch origin main
@@ -22,7 +22,7 @@ jobs:
     check-version-already-exist:
         runs-on: ubuntu-24.04
         steps:
-            -   uses: actions/checkout@v4.1.1
+            -   uses: actions/checkout@v6.0.2
             -   uses: ./.github/actions/setup_python_and_poetry
             -   name: Check if version already exists
                 run: |
@@ -44,7 +44,7 @@ jobs:
                     "mypy --config mypy.toml"
                 ]
         steps:
-            -   uses: actions/checkout@v4.1.1
+            -   uses: actions/checkout@v6.0.2
             -   uses: ./.github/actions/setup_python_and_poetry
             -   uses: ./.github/actions/linters
                 with:
@@ -59,7 +59,7 @@ jobs:
                   - python-version: "3.13"
                     pydantic-version: "2.1"
         steps:
-            -   uses: actions/checkout@v4.1.1
+            -   uses: actions/checkout@v6.0.2
             -   uses: ./.github/actions/setup_python_and_poetry
                 with:
                     python-version: ${{ matrix.python-version }}
@@ -80,7 +80,7 @@ jobs:
             contents: write
             id-token: write
         steps:
-            -   uses: actions/checkout@v4.1.1
+            -   uses: actions/checkout@v6.0.2
             -   uses: ./.github/actions/setup_python_and_poetry
             -   name: Build release distributions
                 run: poetry build
@@ -112,7 +112,7 @@ jobs:
         needs:
             - publish-package
         steps:
-            -   uses: actions/checkout@v4.1.1
+            -   uses: actions/checkout@v6.0.2
             -   uses: ./.github/actions/setup_python_and_poetry
             -   name: Install dependencies
                 run: poetry install --with test
