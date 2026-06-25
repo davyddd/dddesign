@@ -33,7 +33,7 @@ class Repository(BaseModel):
         if external_allowed_methods:
             allowed_methods = {*allowed_methods, *external_allowed_methods}
 
-        methods = (name for name, member in cls.__dict__.items() if inspect.isfunction(member))
+        methods = (name for name in cls.__dict__ if inspect.isfunction(getattr(cls, name)))
 
         for method in methods:
             if method.startswith('__') and method.endswith('__'):
