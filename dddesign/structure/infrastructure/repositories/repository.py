@@ -16,6 +16,8 @@ BASE_ALLOWED_METHODS = {
     'bulk_delete',  # Deletes multiple entities, accepts a collection of PKs
     'update_by_filters',  # Updates entities matching filters
     'delete_by_filters',  # Deletes entities matching filters
+    'exists',  # Returns whether any entity matches filters
+    'count',  # Returns the number of entities matching filters
 }
 
 
@@ -33,7 +35,11 @@ class Repository(BaseModel):
         if external_allowed_methods:
             allowed_methods = {*allowed_methods, *external_allowed_methods}
 
-        methods = (name for name in cls.__dict__ if inspect.isfunction(getattr(cls, name)))
+        methods = (
+            name
+            for name, member in cls.__dict__.items()
+            if inspect.isfunction(member) or isinstance(member, (staticmethod, classmethod))
+        )
 
         for method in methods:
             if method.startswith('__') and method.endswith('__'):
