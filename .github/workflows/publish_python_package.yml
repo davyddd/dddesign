@@ -54,7 +54,7 @@ jobs:
         strategy:
             matrix:
                 python-version: [ "3.10", "3.11", "3.12", "3.13"]
-                pydantic-version: [ "2.1", "2.10", "2.11", "2.12" ]
+                pydantic-version: [ "2.1", "2.11", "2.12", "2.13" ]
                 exclude:
                   - python-version: "3.13"
                     pydantic-version: "2.1"
