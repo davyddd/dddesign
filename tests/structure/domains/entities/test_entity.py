@@ -1,4 +1,3 @@
-from typing import Optional
 from unittest import TestCase
 from uuid import uuid4
 
@@ -13,7 +12,7 @@ DEFAULT_VALUE = str(uuid4())
 
 
 class SomeDTO(DataTransferObject):
-    some_field: Optional[str] = None
+    some_field: str | None = None
 
 
 class SomeEntity(Entity):

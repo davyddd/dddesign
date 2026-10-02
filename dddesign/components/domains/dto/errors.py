@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated
 
 from pydantic import Field
 
@@ -8,7 +8,7 @@ from dddesign.structure.domains.errors import CollectionError
 
 
 class Errors(DataTransferObject):
-    errors: Annotated[List[Error], Field(min_length=1)]
+    errors: Annotated[list[Error], Field(min_length=1)]
 
     @property
     def status_code(self) -> int:

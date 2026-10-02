@@ -1,4 +1,3 @@
-from typing import Optional, Set
 from unittest import TestCase
 
 from dddesign.structure.infrastructure.repositories import Repository
@@ -55,7 +54,7 @@ class TestRepositoryAllowedMethods(TestCase):
 
     def test_external_allowed_methods_do_not_raise(self) -> None:
         class TestRepositoryImpl(Repository):
-            EXTERNAL_ALLOWED_METHODS: Optional[Set[str]] = {
+            EXTERNAL_ALLOWED_METHODS: set[str] | None = {
                 'external_function',
                 'external_staticmethod',
                 'external_classmethod',

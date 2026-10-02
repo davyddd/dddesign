@@ -1,4 +1,3 @@
-from typing import Dict, List
 from unittest import TestCase
 
 from parameterized import parameterized
@@ -15,8 +14,8 @@ class SomeModel(TrackChangesMixin, BaseModel):
     str_field: str
     int_field: int
     float_field: float
-    dict_field: Dict[str, str]
-    list_field: List[int]
+    dict_field: dict[str, str]
+    list_field: list[int]
     nested_model_field: NestedModel
 
 
@@ -28,7 +27,7 @@ class TestTrackChangesMixin(TestCase):
             float_field=1.0,
             dict_field={'key': 'value'},
             list_field=[1, 2, 3],
-            nested_model_field={'str_field': 'initial'},
+            nested_model_field={'str_field': 'initial'},  # ty: ignore[invalid-argument-type]
         )
         self.initial_state = self.some_model_instance.initial_state
 

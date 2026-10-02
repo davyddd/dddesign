@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, NamedTuple, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Generic, NamedTuple, TypeVar
 
 from ddutils.annotation_helpers import is_subclass
 from ddutils.convertors import convert_camel_case_to_snake_case
@@ -13,25 +13,25 @@ from dddesign.structure.infrastructure.repositories import Repository
 from dddesign.structure.services.service import Service
 from dddesign.utils.base_model import create_pydantic_error_instance
 
-ApplicationT = TypeVar('ApplicationT')
+ApplicationT = TypeVar('ApplicationT', bound=BaseModel)
 
-DependencyValue = Union[
-    InternalAdapter,
-    ExternalAdapter,
-    Repository,
-    Application,
-    Service,
-    Type[InternalAdapter],
-    Type[ExternalAdapter],
-    Type[Repository],
-    Type[Application],
-    Type[Service],
-]
+DependencyValue = (
+    InternalAdapter
+    | ExternalAdapter
+    | Repository
+    | Application
+    | Service
+    | type[InternalAdapter]
+    | type[ExternalAdapter]
+    | type[Repository]
+    | type[Application]
+    | type[Service]
+)
 DEPENDENCY_VALUE_TYPES = tuple(_v for _v in getattr(DependencyValue, '__args__', ()) if isinstance(_v, type))
 
 RequestAttributeName = str
 RequestAttributeValue = Any
-RequestAttributeValueCombination = Tuple[RequestAttributeValue, ...]
+RequestAttributeValueCombination = tuple[RequestAttributeValue, ...]
 
 
 class RequestAttributeNotProvideError(BaseError):
@@ -45,22 +45,22 @@ class RequestAttributeValueError(BaseError):
 
 class RequestAttribute(NamedTuple):
     name: RequestAttributeName
-    enum_class: Type[BaseEnum]
+    enum_class: type[BaseEnum]
 
 
 class ApplicationDependencyMapper(BaseModel):
     model_config = ConfigDict(frozen=True)
 
-    request_attribute_name: Optional[RequestAttributeName] = None
-    request_attribute_value_map: Dict[RequestAttributeValue, Any]
+    request_attribute_name: RequestAttributeName | None = None
+    request_attribute_value_map: dict[RequestAttributeValue, Any]
     application_attribute_name: str
 
     @staticmethod
-    def _get_enum_class(request_attribute_value_map: Dict[RequestAttributeValue, DependencyValue]) -> Type[BaseEnum]:
+    def _get_enum_class(request_attribute_value_map: dict[RequestAttributeValue, DependencyValue]) -> type[BaseEnum]:
         return next(iter(request_attribute_value_map.keys())).__class__
 
     @property
-    def enum_class(self) -> Type[BaseEnum]:
+    def enum_class(self) -> type[BaseEnum]:
         return self._get_enum_class(self.request_attribute_value_map)
 
     def get_request_attribute_name(self) -> RequestAttributeName:
@@ -112,47 +112,45 @@ class ApplicationDependencyMapper(BaseModel):
                 message='All values of `request_attribute_value_map` must be instances of `DependencyValue`',
             )
 
-        dependency_values = tuple(request_attribute_value_map.values())
-        if dependency_values:
-            amount_equal_values = 0
-            first_dependency_value = dependency_values[0]
-            for dependency_value in dependency_values[1:]:
-                if dependency_value != first_dependency_value:
-                    break
-
-                if (
-                    not isinstance(dependency_value, type)
-                    and dependency_value == first_dependency_value
-                    and dependency_value.__class__ != first_dependency_value.__class__
-                ):
-                    break
-
-                amount_equal_values += 1
-
-            if amount_equal_values == len(dependency_values) - 1:
-                raise create_pydantic_error_instance(
-                    base_error=ValueError,
-                    code='not_unique_dependency_values',
-                    message='`request_attribute_value_map` must contain more than one unique value',
-                )
+        if cls._all_dependency_values_equal(tuple(request_attribute_value_map.values())):
+            raise create_pydantic_error_instance(
+                base_error=ValueError,
+                code='not_unique_dependency_values',
+                message='`request_attribute_value_map` must contain more than one unique value',
+            )
         return request_attribute_value_map
+
+    @staticmethod
+    def _all_dependency_values_equal(dependency_values: tuple[Any, ...]) -> bool:
+        if not dependency_values:
+            return False
+
+        first_dependency_value = dependency_values[0]
+        for dependency_value in dependency_values[1:]:
+            if dependency_value != first_dependency_value:
+                return False
+            # equal instances of different classes are still different dependencies
+            if not isinstance(dependency_value, type) and dependency_value.__class__ != first_dependency_value.__class__:
+                return False
+
+        return True
 
 
 class ApplicationFactory(BaseModel, Generic[ApplicationT]):
-    dependency_mappers: Tuple[ApplicationDependencyMapper, ...] = ()
-    application_class: Type[ApplicationT]
+    dependency_mappers: tuple[ApplicationDependencyMapper, ...] = ()
+    application_class: type[ApplicationT]
     reuse_implementations: bool = True
 
     # private attributes
-    _request_attributes: Tuple[RequestAttribute, ...] = PrivateAttr(default_factory=tuple)
-    _application_implementations: Dict[RequestAttributeValueCombination, ApplicationT] = PrivateAttr(default_factory=dict)
+    _request_attributes: tuple[RequestAttribute, ...] = PrivateAttr(default_factory=tuple)
+    _application_implementations: dict[RequestAttributeValueCombination, ApplicationT] = PrivateAttr(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
         self._request_attributes = self._get_request_attributes()
         self._application_implementations = {}
 
-    def _get_request_attributes(self) -> Tuple[RequestAttribute, ...]:
+    def _get_request_attributes(self) -> tuple[RequestAttribute, ...]:
         return tuple(
             RequestAttribute(name=mapper.get_request_attribute_name(), enum_class=mapper.enum_class)
             for mapper in self.dependency_mappers
@@ -236,7 +234,7 @@ class ApplicationFactory(BaseModel, Generic[ApplicationT]):
         return application_impl
 
     @property
-    def request_attributes(self) -> Tuple[RequestAttribute, ...]:
+    def request_attributes(self) -> tuple[RequestAttribute, ...]:
         return self._request_attributes
 
     def get(self, **kwargs: RequestAttributeValue) -> ApplicationT:

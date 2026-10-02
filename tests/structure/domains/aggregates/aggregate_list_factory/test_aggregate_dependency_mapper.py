@@ -1,4 +1,4 @@
-from typing import Dict, List, NewType
+from typing import NewType
 from unittest import TestCase
 
 from ddutils.annotation_helpers import get_complex_sequence_element_annotation, is_complex_sequence
@@ -31,19 +31,19 @@ def get_image_without_arguments() -> Image:
     return Image(app_id=1, image_id=ImageId(1))
 
 
-def get_images(image_ids: List[ImageId]) -> Dict[ImageId, Image]:
+def get_images(image_ids: list[ImageId]) -> dict[ImageId, Image]:
     return {image_id: Image(image_id=image_id) for image_id in image_ids}
 
 
-def get_images_with_list_return_annotation(image_ids: List[ImageId]) -> List[Image]:
+def get_images_with_list_return_annotation(image_ids: list[ImageId]) -> list[Image]:
     return [Image(image_id=image_id) for image_id in image_ids]
 
 
-def get_images_with_not_typed_dict_return_annotation(image_ids: List[ImageId]) -> dict:
+def get_images_with_not_typed_dict_return_annotation(image_ids: list[ImageId]) -> dict:
     return {image_id: Image(image_id=image_id) for image_id in image_ids}
 
 
-def get_images_with_incorrect_typed_dict_return_annotation(image_ids: List[ImageId]) -> Dict[int, Image]:
+def get_images_with_incorrect_typed_dict_return_annotation(image_ids: list[ImageId]) -> dict[int, Image]:
     return {image_id: Image(image_id=image_id) for image_id in image_ids}
 
 
@@ -122,8 +122,8 @@ class TestAggregateDependencyMapper(TestCase):
 
         # Assert
         self.assertEqual(method_related_argument.name, 'image_ids')
-        self.assertEqual(method_related_argument.annotation, List[ImageId])
-        self.assertEqual(method_return_argument_annotation, Dict[ImageId, Image])
+        self.assertEqual(method_related_argument.annotation, list[ImageId])
+        self.assertEqual(method_return_argument_annotation, dict[ImageId, Image])
 
         self.assertTrue(is_complex_sequence(method_related_argument.annotation))
         self.assertEqual(get_complex_sequence_element_annotation(method_related_argument.annotation), ImageId)

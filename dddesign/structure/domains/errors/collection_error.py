@@ -1,12 +1,10 @@
-from typing import List
-
 from ddutils.convertors import convert_to_repr
 
 from dddesign.structure.domains.errors.base_error import BaseError
 
 
 class CollectionError(Exception):
-    errors: List[BaseError]
+    errors: list[BaseError]
 
     def __init__(self):
         self.errors = []

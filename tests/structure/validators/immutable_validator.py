@@ -20,7 +20,7 @@ def validate_immutable(component_class: Any, method_name: str = 'handle'):
 
     # Assert
     try:
-        instance.some_field = 'new value'
+        instance.some_field = 'new value'  # ty: ignore[invalid-assignment]
         raise AssertionError('TypeError was expected but not raised')
     except ValidationError as error:
         _error = error.errors()[0]

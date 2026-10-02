@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from copy import deepcopy
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from pydantic import BaseModel, PrivateAttr
 
@@ -8,14 +8,14 @@ UNDEFINED_VALUE = object()
 
 
 class TrackChangesMixin(BaseModel):
-    _initial_state: Dict[str, Any] = PrivateAttr(default_factory=dict)
+    _initial_state: dict[str, Any] = PrivateAttr(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
         self.update_initial_state()
 
     def _get_changed_fields(self) -> Generator[str, None, None]:
-        for field in self.model_fields:
+        for field in type(self).model_fields:
             if self._initial_state.get(field, UNDEFINED_VALUE) != getattr(self, field):
                 yield field
 
@@ -24,23 +24,23 @@ class TrackChangesMixin(BaseModel):
         return next(self._get_changed_fields(), None) is not None
 
     @property
-    def changed_fields(self) -> Tuple[str, ...]:
+    def changed_fields(self) -> tuple[str, ...]:
         return tuple(self._get_changed_fields())
 
     @property
-    def changed_data(self) -> Dict[str, Any]:
+    def changed_data(self) -> dict[str, Any]:
         return {field: getattr(self, field, None) for field in self._get_changed_fields()}
 
     @property
-    def diffs(self) -> Dict[str, Tuple[Any, Any]]:
+    def diffs(self) -> dict[str, tuple[Any, Any]]:
         return {field: (self._initial_state[field], getattr(self, field)) for field in self._get_changed_fields()}
 
     @property
-    def initial_state(self) -> Dict[str, Any]:
+    def initial_state(self) -> dict[str, Any]:
         return self._initial_state
 
-    def update_initial_state(self, fields: Optional[tuple] = None):
-        model_fields = set(self.model_fields.keys())
+    def update_initial_state(self, fields: tuple | None = None):
+        model_fields = set(type(self).model_fields.keys())
         if fields:
             for field in fields:
                 if field in model_fields:

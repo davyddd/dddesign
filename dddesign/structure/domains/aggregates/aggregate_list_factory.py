@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, List, NamedTuple, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, NamedTuple, TypeVar
 
 from ddutils.annotation_helpers import (
     get_annotation_origin,
@@ -36,7 +37,7 @@ class AggregateDependencyMapper(BaseModel):
     aggregate_attribute_name: str
 
     method_getter: Callable
-    method_extra_arguments: Dict[str, Any] = Field(default_factory=dict)
+    method_extra_arguments: dict[str, Any] = Field(default_factory=dict)
 
     @cached_property
     def method_related_argument(self) -> MethodArgument:
@@ -116,9 +117,9 @@ class AggregateDependencyMapper(BaseModel):
 class AggregateListFactory(BaseModel, Generic[AggregateT]):
     model_config = ConfigDict(frozen=True)
 
-    aggregate_class: Type[AggregateT]
+    aggregate_class: type[AggregateT]
     aggregate_entity_attribute_name: str
-    dependency_mappers: Tuple[AggregateDependencyMapper, ...]
+    dependency_mappers: tuple[AggregateDependencyMapper, ...]
 
     @model_validator(mode='after')
     def validate_consistency(self):
@@ -165,39 +166,45 @@ class AggregateListFactory(BaseModel, Generic[AggregateT]):
 
         return self
 
-    def create_list(self, entities: List[Entity]) -> List[AggregateT]:
-        dependency_related_object_map: Dict[int, Dict[RelatedObjectId, RelatedObject]] = {}
-        for dependency_item, dependency in enumerate(self.dependency_mappers):
-            related_objects: Dict[RelatedObjectId, RelatedObject] = {}
-            if is_complex_sequence(dependency.method_related_argument.annotation):
-                annotation_origin = get_annotation_origin(dependency.method_related_argument.annotation)
-                related_object_ids: Sequence[RelatedObjectId] = annotation_origin(
-                    {
-                        related_object_id
-                        for entity in entities
-                        if (
-                            (related_object_id := getattr(entity, dependency.entity_attribute_name))
-                            and related_object_id is not None
-                        )
-                    }
-                )
-                related_objects = dependency.method_getter(
-                    **{dependency.method_related_argument.name: related_object_ids, **dependency.method_extra_arguments}
-                )
-            else:
-                for entity in entities:
-                    related_object_id = getattr(entity, dependency.entity_attribute_name)
-                    if related_object_id is not None and related_object_id not in related_objects:
-                        related_object = dependency.method_getter(
-                            **{dependency.method_related_argument.name: related_object_id, **dependency.method_extra_arguments}
-                        )
-                        related_objects[related_object_id] = related_object
+    @staticmethod
+    def _get_related_objects(
+        dependency: AggregateDependencyMapper, entities: list[Entity]
+    ) -> dict[RelatedObjectId, RelatedObject]:
+        """Loads the related objects of one dependency: in bulk when the getter accepts a sequence, one by one otherwise."""
+        if is_complex_sequence(dependency.method_related_argument.annotation):
+            annotation_origin = get_annotation_origin(dependency.method_related_argument.annotation)
+            related_object_ids: Sequence[RelatedObjectId] = annotation_origin(
+                {
+                    related_object_id
+                    for entity in entities
+                    if (
+                        (related_object_id := getattr(entity, dependency.entity_attribute_name))
+                        and related_object_id is not None
+                    )
+                }
+            )
+            return dependency.method_getter(
+                **{dependency.method_related_argument.name: related_object_ids, **dependency.method_extra_arguments}
+            )
 
-            dependency_related_object_map[dependency_item] = related_objects
-
-        aggregates: List[AggregateT] = []
+        related_objects: dict[RelatedObjectId, RelatedObject] = {}
         for entity in entities:
-            aggregate_init: Dict[str, Any] = {self.aggregate_entity_attribute_name: entity}
+            related_object_id = getattr(entity, dependency.entity_attribute_name)
+            if related_object_id is not None and related_object_id not in related_objects:
+                related_objects[related_object_id] = dependency.method_getter(
+                    **{dependency.method_related_argument.name: related_object_id, **dependency.method_extra_arguments}
+                )
+        return related_objects
+
+    def create_list(self, entities: list[Entity]) -> list[AggregateT]:
+        dependency_related_object_map: dict[int, dict[RelatedObjectId, RelatedObject]] = {
+            dependency_item: self._get_related_objects(dependency, entities)
+            for dependency_item, dependency in enumerate(self.dependency_mappers)
+        }
+
+        aggregates: list[AggregateT] = []
+        for entity in entities:
+            aggregate_init: dict[str, Any] = {self.aggregate_entity_attribute_name: entity}
             for dependency_item, dependency in enumerate(self.dependency_mappers):
                 related_object_id = getattr(entity, dependency.entity_attribute_name)
                 aggregate_init[dependency.aggregate_attribute_name] = dependency_related_object_map[dependency_item].get(

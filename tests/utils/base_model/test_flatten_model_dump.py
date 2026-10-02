@@ -1,4 +1,3 @@
-from typing import List, Optional
 from unittest import TestCase
 
 from pydantic import BaseModel
@@ -24,8 +23,8 @@ class Filters(BaseModel):
 class Request(BaseModel):
     headers: Headers
     body: str
-    tags: List[str]
-    filters: Optional[Filters] = None
+    tags: list[str]
+    filters: Filters | None = None
 
 
 class Flat(BaseModel):
