@@ -8,9 +8,12 @@ exclude = [
     "__pycache__",
     ".ruff_cache",
     ".pytest_cache",
+    ".complexipy_cache",
+    ".venv",
+    "fabfile.py",
 ]
 line-length = 128
-target-version = "py310"
+target-version = "py311"
 output-format = "concise"
 
 
@@ -58,10 +61,10 @@ ignore = [
     "Q000", "Q001", "Q002", "Q003",
     # flake8-todos
     "TD003",
-    # pyupgrade
-    "UP006", "UP007", "UP035", "UP045",
 ]
-extend-per-file-ignores = { "__init__.py" = ["F401"] }
+
+[lint.extend-per-file-ignores]
+"__init__.py" = ["F401"]
 
 
 [lint.isort]
@@ -83,4 +86,4 @@ inline-quotes = "single"
 [format]
 quote-style = "single"
 indent-style = "space"
-skip-magic-trailing-comma = true
+skip-magic-trailing-comma = false

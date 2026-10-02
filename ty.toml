@@ -1,0 +1,25 @@
+[terminal]
+output-format = "concise"
+
+[environment]
+python-version = "3.11"
+# Path to the environment inside the Docker container (see Dockerfile);
+# in CI the reusable workflow overrides it with `ty check --python .venv`.
+python = "/usr/local"
+
+[src]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".ruff_cache",
+    ".pytest_cache",
+    ".complexipy_cache",
+    ".venv",
+    "fabfile.py",
+]
+
+[rules]
+# Libraries support several Python versions: a `# type: ignore` needed on one of them is unused on another.
+unused-type-ignore-comment = "ignore"
+# Libraries deprecate their own API and keep testing it.
+deprecated = "ignore"
