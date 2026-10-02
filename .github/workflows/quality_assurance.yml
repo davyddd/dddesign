@@ -8,36 +8,16 @@ on:
         branches:
             - main
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
-    linters:
-        runs-on: ubuntu-24.04
-        strategy:
-            matrix:
-                command: [
-                    "ruff check . --config ruff.toml",
-                    "ruff format . --check --config ruff.toml",
-                    "mypy --config mypy.toml"
-                ]
-        steps:
-            -   uses: actions/checkout@v6.0.2
-            -   uses: ./.github/actions/setup_python_and_poetry
-            -   uses: ./.github/actions/linters
-                with:
-                    command: ${{ matrix.command }}
-    tests:
-        runs-on: ubuntu-24.04
-        strategy:
-            matrix:
-                python-version: [ "3.10", "3.11", "3.12", "3.13"]
-                pydantic-version: [ "2.1", "2.11", "2.12", "2.13" ]
-                exclude:
-                    - python-version: "3.13"
-                      pydantic-version: "2.1"
-        steps:
-            -   uses: actions/checkout@v6.0.2
-            -   uses: ./.github/actions/setup_python_and_poetry
-                with:
-                    python-version: ${{ matrix.python-version }}
-            -   uses: ./.github/actions/tests
-                with:
-                    pydantic-version: ${{ matrix.pydantic-version }}
+    quality-assurance:
+        uses: davyddd/dd-lib-stub/.github/workflows/quality_assurance.yml@v0.0.7
+        with:
+            package-name: dddesign
+            test-matrix: '{"python-version": ["3.11", "3.12", "3.13", "3.14"], "pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}]}'
+            default-python-version: '3.14'
+            upload-coverage: ${{ github.event_name == 'push' }}
+        secrets: inherit

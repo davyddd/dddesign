@@ -1,0 +1,12 @@
+paths = ["."]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".ruff_cache",
+    ".pytest_cache",
+    ".complexipy_cache",
+    ".venv",
+    "fabfile.py",
+]
+max-complexity-allowed = 15
+failed = true
