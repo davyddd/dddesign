@@ -1,4 +1,4 @@
-from typing import Dict, List, NewType
+from typing import NewType
 from unittest import TestCase
 
 from parameterized import parameterized
@@ -29,7 +29,7 @@ def get_image(image_id: ImageId) -> Image:
     return Image(image_id=image_id)
 
 
-def get_images(image_ids: List[ImageId]) -> Dict[ImageId, Image]:
+def get_images(image_ids: list[ImageId]) -> dict[ImageId, Image]:
     return {image_id: Image(image_id=image_id) for image_id in image_ids}
 
 

@@ -1,5 +1,5 @@
 import re
-from typing import Any, Optional
+from typing import Any
 
 from ddutils.convertors import convert_camel_case_to_snake_case, convert_to_repr
 
@@ -10,14 +10,14 @@ class BaseError(Exception):
     message: str
     error_code: str
     status_code: int
-    field_name: Optional[str]
+    field_name: str | None
 
     def __init__(
         self,
-        message: Optional[str] = None,
-        error_code: Optional[str] = None,
-        status_code: Optional[int] = None,
-        field_name: Optional[str] = None,
+        message: str | None = None,
+        error_code: str | None = None,
+        status_code: int | None = None,
+        field_name: str | None = None,
         **kwargs: Any,
     ):
         message = message or getattr(self, 'message', None)

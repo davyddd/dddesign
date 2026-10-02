@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any
 
 from dddesign.structure.domains.constants import BaseEnum
 
@@ -11,7 +11,7 @@ class ChoiceEnum(BaseEnum):
         return _name.title()
 
     @classmethod
-    def get_choices(cls) -> Tuple[Tuple[Any, str], ...]:
+    def get_choices(cls) -> tuple[tuple[Any, str], ...]:
         return tuple((value.value, value.get_title()) for value in cls)
 
 

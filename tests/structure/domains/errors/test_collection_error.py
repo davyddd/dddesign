@@ -29,4 +29,4 @@ class TestCollectionError(TestCase):
 
         # Assert
         with self.assertRaises(TypeError):
-            error.add(ValueError('Test message'))
+            error.add(ValueError('Test message'))  # ty: ignore[invalid-argument-type]

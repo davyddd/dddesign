@@ -1,8 +1,7 @@
-from typing import Any, Dict, List, Optional
+from typing import Annotated, Any
 from unittest import TestCase
 
 from pydantic import AfterValidator, BaseModel, Field, ValidationError, field_validator, model_validator
-from typing_extensions import Annotated
 
 from dddesign.structure.domains.constants import BaseEnum
 from dddesign.structure.domains.errors import BaseError, CollectionError
@@ -18,7 +17,7 @@ class ErrorTextEnum(str, BaseEnum):
     LIST_MUST_HAVE_FIRST_ELEMENT_AS_ONE = 'List must have first element as `one`'
 
 
-def validate_list(value: List[str]) -> List[str]:
+def validate_list(value: list[str]) -> list[str]:
     errors = []
     if len(value) > 2:  # noqa: PLR2004
         errors.append(ErrorTextEnum.LIST_MUST_HAVE_AT_MOST_2_ELEMENTS.value)
@@ -49,10 +48,10 @@ class PatternModel(BaseModel):
 class SomeModel(BaseModel):
     two_symbols_field: str
     positive_int_field: int
-    dict_key_str_field: Dict[str, Any]
-    list_max_two_elements_field: Annotated[List[str], AfterValidator(validate_list)]
-    enum_field: Optional[SomeEnum] = None
-    nested_model_field: Optional[NestedModel] = None
+    dict_key_str_field: dict[str, Any]
+    list_max_two_elements_field: Annotated[list[str], AfterValidator(validate_list)]
+    enum_field: SomeEnum | None = None
+    nested_model_field: NestedModel | None = None
 
     @field_validator('two_symbols_field')
     @classmethod
@@ -81,12 +80,16 @@ class SomeModel(BaseModel):
 
 class TestWrapErrorFunction(TestCase):
     def setUp(self):
-        self.correct_required_fields_data = {
+        self.correct_required_fields_data: dict[str, Any] = {
             'two_symbols_field': 'ab',
             'positive_int_field': 1,
             'dict_key_str_field': {},
             'list_max_two_elements_field': ['one', 'two'],
         }
+
+    def _data(self, **overrides: Any) -> dict[str, Any]:
+        """Valid model data with some fields overridden by deliberately invalid values."""
+        return {**self.correct_required_fields_data, **overrides}
 
     def test_field_validator_with_python_error(self):
         # Arrange
@@ -94,7 +97,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(**{**self.correct_required_fields_data, 'two_symbols_field': 'abc'})
+            SomeModel(**self._data(two_symbols_field='abc'))
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -114,7 +117,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(**{**self.correct_required_fields_data, 'positive_int_field': -1})
+            SomeModel(**self._data(positive_int_field=-1))
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -134,7 +137,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(**{**self.correct_required_fields_data, 'positive_int_field': 2})
+            SomeModel(**self._data(positive_int_field=2))
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -154,7 +157,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(**{**self.correct_required_fields_data, 'dict_key_str_field': {1: 1}})
+            SomeModel(**self._data(dict_key_str_field={1: 1}))
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -174,7 +177,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(**{**self.correct_required_fields_data, 'list_max_two_elements_field': ['one', 2]})
+            SomeModel(**self._data(list_max_two_elements_field=['one', 2]))
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -194,9 +197,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(
-                **{**self.correct_required_fields_data, 'list_max_two_elements_field': ['incorrect_value', 'two', 'three']}
-            )
+            SomeModel(**self._data(list_max_two_elements_field=['incorrect_value', 'two', 'three']))
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -215,7 +216,7 @@ class TestWrapErrorFunction(TestCase):
     def test_invalid_error(self):
         # Act & Assert
         with self.assertRaises(TypeError):
-            wrap_error(ValueError('This is not a ValidationError'))
+            wrap_error(ValueError('This is not a ValidationError'))  # ty: ignore[invalid-argument-type]
 
     def test_required_fields_error(self):
         # Arrange
@@ -223,7 +224,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel()
+            SomeModel()  # ty: ignore[missing-argument]
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -246,7 +247,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(**{**self.correct_required_fields_data, 'enum_field': 'incorrect_value'})
+            SomeModel(**self._data(enum_field='incorrect_value'))
         except ValidationError as e:
             collection_error = wrap_error(e)
 
@@ -284,7 +285,7 @@ class TestWrapErrorFunction(TestCase):
 
         # Act
         try:
-            SomeModel(**{**self.correct_required_fields_data, 'nested_model_field': {'int_field': 'incorrect_value'}})
+            SomeModel(**self._data(nested_model_field={'int_field': 'incorrect_value'}))
         except ValidationError as e:
             collection_error = wrap_error(e)
 

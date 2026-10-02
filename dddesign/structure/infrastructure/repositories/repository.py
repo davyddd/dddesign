@@ -1,5 +1,4 @@
 import inspect
-from typing import Optional, Set
 
 from pydantic import BaseModel, ConfigDict
 
@@ -24,7 +23,7 @@ BASE_ALLOWED_METHODS = {
 class Repository(BaseModel):
     model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
-    EXTERNAL_ALLOWED_METHODS: Optional[Set[str]] = None
+    EXTERNAL_ALLOWED_METHODS: set[str] | None = None
 
     @classmethod
     def __pydantic_init_subclass__(cls, **kwargs):
