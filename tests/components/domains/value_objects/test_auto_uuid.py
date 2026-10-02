@@ -1,6 +1,8 @@
+import sys
 from unittest import TestCase
 from uuid import UUID, uuid4
 
+import pydantic
 from parameterized import parameterized
 from pydantic import BaseModel as BaseModelV2, Field as FieldV2, ValidationError as ValidationErrorV2
 from pydantic.v1 import BaseModel as BaseModelV1, Field as FieldV1, ValidationError as ValidationErrorV1
@@ -12,14 +14,27 @@ class CustomerId(AutoUUID):
     pass
 
 
-class CustomerV1(BaseModelV1):
-    customer_id: CustomerId = FieldV1(default_factory=CustomerId)
-    name: str
-
-
 class CustomerV2(BaseModelV2):
     customer_id: CustomerId = FieldV2(default_factory=CustomerId)
     name: str
+
+
+PYDANTIC_CLASSES = [CustomerV2]
+VALIDATION_ERROR_CASES = [(CustomerV2, ValidationErrorV2)]
+SERIALIZATION_CASES = [(CustomerV2, 'model_dump')]
+
+# pydantic.v1 cannot evaluate the deferred annotations of Python 3.14 before pydantic 2.13
+PYDANTIC_V1_SUPPORTED = sys.version_info < (3, 14) or tuple(int(part) for part in pydantic.VERSION.split('.')[:2]) >= (2, 13)
+
+if PYDANTIC_V1_SUPPORTED:
+
+    class CustomerV1(BaseModelV1):
+        customer_id: CustomerId = FieldV1(default_factory=CustomerId)
+        name: str
+
+    PYDANTIC_CLASSES.append(CustomerV1)
+    VALIDATION_ERROR_CASES.append((CustomerV1, ValidationErrorV1))
+    SERIALIZATION_CASES.append((CustomerV1, 'dict'))
 
 
 class TestAutoUUID(TestCase):
@@ -85,7 +100,7 @@ class TestAutoUUID(TestCase):
         # Assert
         self.assertEqual(result.bytes, bytes_value)
 
-    @parameterized.expand((CustomerV1, CustomerV2))
+    @parameterized.expand(PYDANTIC_CLASSES)
     def test_pydantic_validation_auto_generation(self, pydantic_class):
         # Act
         customer = pydantic_class(name='John Doe')
@@ -94,7 +109,7 @@ class TestAutoUUID(TestCase):
         self.assertIsInstance(customer.customer_id, CustomerId)
         self.assertIsInstance(customer.customer_id, UUID)
 
-    @parameterized.expand((CustomerV1, CustomerV2))
+    @parameterized.expand(PYDANTIC_CLASSES)
     def test_pydantic_validation_from_hex_string_with_hyphens(self, pydantic_class):
         # Arrange
         hex_string = '12345678-1234-5678-1234-567812345678'
@@ -106,7 +121,7 @@ class TestAutoUUID(TestCase):
         self.assertEqual(str(customer.customer_id), hex_string)
         self.assertIsInstance(customer.customer_id, UUID)
 
-    @parameterized.expand((CustomerV1, CustomerV2))
+    @parameterized.expand(PYDANTIC_CLASSES)
     def test_pydantic_validation_from_uuid(self, pydantic_class):
         # Arrange
         original_uuid = uuid4()
@@ -118,13 +133,13 @@ class TestAutoUUID(TestCase):
         self.assertEqual(customer.customer_id.hex, original_uuid.hex)
         self.assertIsInstance(customer.customer_id, UUID)
 
-    @parameterized.expand(((CustomerV1, ValidationErrorV1), (CustomerV2, ValidationErrorV2)))
+    @parameterized.expand(VALIDATION_ERROR_CASES)
     def test_pydantic_validation_invalid_hex_string(self, pydantic_class, validation_error):
         # Act & Assert
         with self.assertRaises(validation_error):
             pydantic_class(customer_id='invalid-uuid', name='Test User')
 
-    @parameterized.expand(((CustomerV1, 'dict'), (CustomerV2, 'model_dump')))
+    @parameterized.expand(SERIALIZATION_CASES)
     def test_pydantic_serialization(self, pydantic_class, model_dump_name):
         # Arrange
         hex_string = '12345678-1234-5678-1234-567812345678'
