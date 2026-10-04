@@ -14,10 +14,17 @@ concurrency:
 
 jobs:
     quality-assurance:
-        uses: davyddd/dd-lib-stub/.github/workflows/quality_assurance.yml@v0.0.7
+        uses: davyddd/dd-lib-stub/.github/workflows/quality_assurance.yml@v0.0.8
         with:
-            package-name: dddesign
             test-matrix: '{"python-version": ["3.11", "3.12", "3.13", "3.14"], "pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}]}'
             default-python-version: '3.14'
-            upload-coverage: ${{ github.event_name == 'push' }}
+        secrets: inherit
+    coverage:
+        # after the checks and only for pushes to main: pull requests do not upload coverage
+        needs: quality-assurance
+        if: ${{ github.event_name == 'push' }}
+        uses: davyddd/dd-lib-stub/.github/workflows/coverage.yml@v0.0.8
+        with:
+            package-name: dddesign
+            python-version: '3.14'
         secrets: inherit
