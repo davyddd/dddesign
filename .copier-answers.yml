@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; do NOT edit manually.
-_commit: v0.0.7
+_commit: v0.0.8
 _src_path: gh:davyddd/dd-lib-stub
 copyright_year: 2024
 max_python_version: '3.14'
@@ -8,7 +8,6 @@ package_description: Domain Driven Design Library
 package_keywords: python, ddd, domain driven design, ddd architecture, ddd structure,
     architecture, structure, dddesign
 package_name: dddesign
-test_matrix: '{"pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12",
-    "pydantic==2.13"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"},
-    {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version":
-    "3.14", "pydantic": "pydantic==2.11"}]}'
+test_matrix: '{"pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13"],
+    "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version":
+    "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}]}'
