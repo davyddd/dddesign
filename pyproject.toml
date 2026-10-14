@@ -1,7 +1,7 @@
 [project]
 name = "dddesign"
 description = "Domain Driven Design Library"
-version = "2.1.0"
+version = "2.1.1"
 authors = [{ name = "davyddd" }]
 license = "MIT"
 license-files = ["LICENSE"]
@@ -19,7 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "pydantic>=2.1,<2.14",
-    "ddutils>=0.2.0,<0.3.0",
+    "ddutils>=0.3.0,<0.4.0",
 ]
 
 [project.urls]

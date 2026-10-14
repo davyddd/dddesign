@@ -217,7 +217,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ddutils", specifier = ">=0.2.0,<0.3.0" },
+    { name = "ddutils", specifier = ">=0.3.0,<0.4.0" },
     { name = "pydantic", specifier = ">=2.1,<2.14" },
 ]
 
@@ -239,11 +239,11 @@ test = [
 
 [[package]]
 name = "ddutils"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/4c/36/76c3c5cd112b93c58c661de0679cdc81126b06d98ae80a97a8b271f9db67/ddutils-0.2.0.tar.gz", hash = "sha256:a83062ed795ea5a0dc084962ab4f05e20ee675d1605d7fcfd33b6b9c403fb369", size = 10554, upload-time = "2026-10-02T15:31:06.713Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/6d/ac32e5193f45af40a489e8329a0c4a984f15d2eeb554f4b21aeb91852181/ddutils-0.3.0.tar.gz", hash = "sha256:0ed1116bc8ecb095155c9e5fec8acc2d8dfc38cb912cb450a7363f6e7620b744", size = 16116, upload-time = "2026-10-14T11:15:41.197Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/e4/0411e5b193a8e1f83c7b35ce27686a70a603ced6aedd71b58807506aad78/ddutils-0.2.0-py3-none-any.whl", hash = "sha256:1417561ce541910e21529396252b129c127ed663c715c82164162e8626069beb", size = 14324, upload-time = "2026-10-02T15:31:05.58Z" },
+    { url = "https://files.pythonhosted.org/packages/df/d9/08993ec1efaea8b3ef0b2350d38a4f1d76735b2a3190e180fbcc5286dce7/ddutils-0.3.0-py3-none-any.whl", hash = "sha256:b2294d8c37d57f2f572410a9ece28342a817d13d1ae07f2622c02e08ba99f1ff", size = 20258, upload-time = "2026-10-14T11:15:39.833Z" },
 ]
 
 [[package]]
