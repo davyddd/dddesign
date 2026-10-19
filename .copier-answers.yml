@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; do NOT edit manually.
-_commit: v0.0.11
+_commit: v0.0.12
 _src_path: gh:davyddd/dd-lib-stub
 copyright_year: 2024
 max_python_version: '3.14'
