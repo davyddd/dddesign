@@ -20,12 +20,14 @@ pip install dddesign
 
 ## Compatibility
 
-Python 3.11 to 3.14, `pydantic>=2.1,<2.14`, `ddutils>=0.3.0`. What changed in each release, breaking changes
-included, is in the [GitHub releases](https://github.com/davyddd/dddesign/releases).
+Python 3.11 to 3.14. What changed in each release, breaking changes included,
+is in the [GitHub releases](https://github.com/davyddd/dddesign/releases).
+
+Depends on `pydantic>=2.1,<2.14` and `ddutils>=0.3.0,<0.5.0`. The tests need no external services.
 
 ## Development
 
-The project runs entirely in Docker. The tests need no external services. Requires Docker and [Fabric](https://www.fabfile.org/) on the host:
+The project runs entirely in Docker. Requires Docker and [Fabric](https://www.fabfile.org/) on the host:
 
 ```bash
 fab build      # build the dev image
