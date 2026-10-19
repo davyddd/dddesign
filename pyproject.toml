@@ -1,13 +1,13 @@
 [project]
 name = "dddesign"
-description = "Domain Driven Design Library"
+description = "Building blocks for Domain-Driven Design on top of pydantic: applications, repositories, adapters, entities, aggregates and errors"
 version = "2.1.2"
 authors = [{ name = "davyddd" }]
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
-keywords = ["python", "ddd", "domain driven design", "ddd architecture", "ddd structure", "architecture", "structure", "dddesign"]
+keywords = ["python", "dddesign", "ddd", "domain driven design", "architecture", "pydantic", "application", "repository", "adapter", "entity", "aggregate", "value object", "dto"]
 # uv_build does not derive these from requires-python (poetry did); PyPI and the pyversions badge read them
 classifiers = [
     "Programming Language :: Python :: 3",

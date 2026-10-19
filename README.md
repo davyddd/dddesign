@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/davyddd/dddesign/branch/main/graph/badge.svg)](https://app.codecov.io/github/davyddd/dddesign)
 [![license](https://img.shields.io/github/license/davyddd/dddesign.svg)](https://github.com/davyddd/dddesign/blob/main/LICENSE)
 
-Domain Driven Design Library
+Building blocks for Domain-Driven Design on top of pydantic: applications, repositories, adapters, entities, aggregates and errors
 
 ## Installation
 
