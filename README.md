@@ -1,4 +1,4 @@
-# DDDesign
+# dddesign
 
 [![pypi](https://img.shields.io/pypi/v/dddesign.svg)](https://pypi.python.org/pypi/dddesign)
 [![downloads](https://static.pepy.tech/badge/dddesign/month)](https://pepy.tech/project/dddesign)
@@ -6,10 +6,7 @@
 [![codecov](https://codecov.io/gh/davyddd/dddesign/branch/main/graph/badge.svg)](https://app.codecov.io/github/davyddd/dddesign)
 [![license](https://img.shields.io/github/license/davyddd/dddesign.svg)](https://github.com/davyddd/dddesign/blob/main/LICENSE)
 
-**DDDesign** is a Python library designed to implement Domain-Driven Design (DDD) principles in software projects. 
-It provides a set of tools and structures to help developers apply DDD architecture. 
-This library is built on top of [Pydantic](https://docs.pydantic.dev/latest/), 
-ensuring data validation and settings management using Python type annotations.
+Domain Driven Design Library
 
 ## Installation
 
@@ -17,13 +14,6 @@ Install the library using pip:
 ```bash
 pip install dddesign
 ```
-
-## Compatibility
-
-Python 3.11 to 3.14. What changed in each release, breaking changes included,
-is in the [GitHub releases](https://github.com/davyddd/dddesign/releases).
-
-Depends on `pydantic>=2.1,<2.14` and `ddutils>=0.3.0,<0.5.0`. The tests need no external services.
 
 ## Development
 
@@ -40,7 +30,14 @@ fab bash       # bash inside the container
 This project was generated from [dd-lib-stub](https://github.com/davyddd/dd-lib-stub);
 run `uvx copier update` to pull in template updates.
 
+## Compatibility
+
+Python 3.11 to 3.14. What changed in each release, breaking changes included,
+is in the [GitHub releases](https://github.com/davyddd/dddesign/releases).
+
 <!-- The sections below are the library's own; copier update leaves them alone -->
+
+Depends on `pydantic>=2.1,<2.14` and `ddutils>=0.3.0,<0.5.0`. The tests need no external services.
 
 ## DDD Components
 
