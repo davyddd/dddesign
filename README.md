@@ -40,6 +40,8 @@ fab bash       # bash inside the container
 This project was generated from [dd-lib-stub](https://github.com/davyddd/dd-lib-stub);
 run `uvx copier update` to pull in template updates.
 
+<!-- The sections below are the library's own; copier update leaves them alone -->
+
 ## DDD Components
 
 Every component is a pydantic model. The structural ones are frozen, so an instance declared at module level
