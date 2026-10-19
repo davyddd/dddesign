@@ -1,3 +1,3 @@
-from . import structure, unittest, utils
+from . import components, structure, unittest, utils
 
-__all__ = ('structure', 'unittest', 'utils')
+__all__ = ('components', 'structure', 'unittest', 'utils')
