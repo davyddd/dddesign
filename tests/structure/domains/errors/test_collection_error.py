@@ -30,3 +30,17 @@ class TestCollectionError(TestCase):
         # Assert
         with self.assertRaises(TypeError):
             error.add(ValueError('Test message'))  # ty: ignore[invalid-argument-type]
+
+    def test_can_be_iterated_more_than_once(self):
+        # Arrange
+        error = CollectionError()
+        error.add(BaseError(message='Test message 1'))
+        error.add(BaseError(message='Test message 2'))
+
+        # Act
+        first = [err.message for err in error]
+        second = [err.message for err in error]
+
+        # Assert
+        self.assertEqual(first, ['Test message 1', 'Test message 2'])
+        self.assertEqual(second, first)
