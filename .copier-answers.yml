@@ -5,6 +5,6 @@ copyright_year: 2024
 max_python_version: '3.14'
 min_python_version: '3.11'
 package_description: 'Building blocks for Domain-Driven Design on top of pydantic: applications, repositories, adapters, entities, aggregates and errors'
-package_keywords: python, dddesign, ddd, domain driven design, architecture, pydantic, application, repository, adapter, entity, aggregate, value object, dto
+package_keywords: python, dddesign, ddd, domain driven design, domain-driven design, clean architecture, hexagonal architecture, pydantic, application, repository, adapter, service, entity, aggregate, value object, dto, errors
 package_name: dddesign
 test_matrix: '{"pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}]}'
