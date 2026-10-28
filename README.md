@@ -37,7 +37,7 @@ is in the [GitHub releases](https://github.com/davyddd/dddesign/releases).
 
 <!-- The sections below are the library's own; copier update leaves them alone -->
 
-Depends on `pydantic>=2.1,<2.14` and `ddutils>=0.3.0,<0.5.0`. The tests need no external services.
+Depends on `pydantic>=2.1,<2.15` and `ddutils>=0.3.0,<0.5.0`. The tests need no external services.
 
 ## DDD Components
 
