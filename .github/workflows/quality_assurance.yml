@@ -16,6 +16,6 @@ jobs:
     quality-assurance:
         uses: davyddd/dd-lib-stub/.github/workflows/quality_assurance.yml@v0.0.12
         with:
-            test-matrix: '{"python-version": ["3.11", "3.12", "3.13", "3.14"], "pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}]}'
+            test-matrix: '{"python-version": ["3.11", "3.12", "3.13", "3.14"], "pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13", "pydantic==2.14"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}]}'
             default-python-version: '3.14'
         secrets: inherit
