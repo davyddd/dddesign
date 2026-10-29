@@ -7,17 +7,17 @@ on:
 
 jobs:
     quality-assurance:
-        uses: davyddd/dd-lib-stub/.github/workflows/quality_assurance.yml@v0.0.12
+        uses: davyddd/dd-lib-stub/.github/workflows/quality_assurance.yml@v0.0.13
         with:
-            test-matrix: '{"python-version": ["3.11", "3.12", "3.13", "3.14"], "pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13", "pydantic==2.14"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}]}'
-            default-python-version: '3.14'
+            test-matrix: '{"python-version": ["3.11", "3.12", "3.13", "3.14", "3.15"], "pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13", "pydantic==2.14"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}, {"python-version": "3.15", "pydantic": "pydantic==2.1"}, {"python-version": "3.15", "pydantic": "pydantic==2.11"}, {"python-version": "3.15", "pydantic": "pydantic==2.12"}, {"python-version": "3.15", "pydantic": "pydantic==2.13"}]}'
+            default-python-version: '3.15'
         secrets: inherit
     build:
         needs: quality-assurance
-        uses: davyddd/dd-lib-stub/.github/workflows/build_python_package.yml@v0.0.12
+        uses: davyddd/dd-lib-stub/.github/workflows/build_python_package.yml@v0.0.13
         with:
             package-name: dddesign
-            python-version: '3.14'
+            python-version: '3.15'
     # PyPI trusted publishing verifies the workflow file of the publishing job, so this job has to live
     # here and cannot be moved into a reusable workflow.
     publish:
@@ -37,14 +37,14 @@ jobs:
             -   uses: pypa/gh-action-pypi-publish@release/v1
     release:
         needs: publish
-        uses: davyddd/dd-lib-stub/.github/workflows/github_release.yml@v0.0.12
+        uses: davyddd/dd-lib-stub/.github/workflows/github_release.yml@v0.0.13
         permissions:
             contents: write
     coverage:
         # last: the coverage report is uploaded only once the release is out
         needs: release
-        uses: davyddd/dd-lib-stub/.github/workflows/coverage.yml@v0.0.12
+        uses: davyddd/dd-lib-stub/.github/workflows/coverage.yml@v0.0.13
         with:
             package-name: dddesign
-            python-version: '3.14'
+            python-version: '3.15'
         secrets: inherit

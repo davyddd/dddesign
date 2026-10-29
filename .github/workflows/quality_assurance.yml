@@ -14,8 +14,8 @@ concurrency:
 
 jobs:
     quality-assurance:
-        uses: davyddd/dd-lib-stub/.github/workflows/quality_assurance.yml@v0.0.12
+        uses: davyddd/dd-lib-stub/.github/workflows/quality_assurance.yml@v0.0.13
         with:
-            test-matrix: '{"python-version": ["3.11", "3.12", "3.13", "3.14"], "pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13", "pydantic==2.14"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}]}'
-            default-python-version: '3.14'
+            test-matrix: '{"python-version": ["3.11", "3.12", "3.13", "3.14", "3.15"], "pydantic": ["pydantic==2.1", "pydantic==2.11", "pydantic==2.12", "pydantic==2.13", "pydantic==2.14"], "exclude": [{"python-version": "3.13", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.1"}, {"python-version": "3.14", "pydantic": "pydantic==2.11"}, {"python-version": "3.15", "pydantic": "pydantic==2.1"}, {"python-version": "3.15", "pydantic": "pydantic==2.11"}, {"python-version": "3.15", "pydantic": "pydantic==2.12"}, {"python-version": "3.15", "pydantic": "pydantic==2.13"}]}'
+            default-python-version: '3.15'
         secrets: inherit

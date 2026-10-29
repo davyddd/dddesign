@@ -32,7 +32,7 @@ run `uvx copier update` to pull in template updates.
 
 ## Compatibility
 
-Python 3.11 to 3.14. What changed in each release, breaking changes included,
+Python 3.11 to 3.15. What changed in each release, breaking changes included,
 is in the [GitHub releases](https://github.com/davyddd/dddesign/releases).
 
 <!-- The sections below are the library's own; copier update leaves them alone -->
