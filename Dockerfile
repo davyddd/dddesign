@@ -1,12 +1,12 @@
 # Local development always runs on the newest supported Python (latest patch release)
-FROM python:3.14-slim
+FROM python:3.15-slim
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 ENV UV_PROJECT_ENVIRONMENT=/usr/local
 ENV PYTHONBREAKPOINT=ipdb.set_trace
 
-COPY --from=ghcr.io/astral-sh/uv:0.12.1 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.6 /uv /uvx /usr/local/bin/
 
 RUN mkdir -p /src && \
     apt-get update && \
